@@ -16,7 +16,7 @@ steps:
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
 - bash: |
-    sudo apt-get install libjpeg-dev
+    sudo apt-get -y install libjpeg-dev libpng-dev
   displayName: 'Install libjpeg'
 
 - bash: |
