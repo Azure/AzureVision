@@ -16,6 +16,10 @@ steps:
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
 - bash: |
+    apt-get install libjpeg-dev
+  displayName: 'Install libjpeg'
+
+- bash: |
     echo "options(repos = '$(cranRepo)')" > ~/.Rprofile
     echo ".libPaths(c('$R_LIBS_USER', .libPaths()))" >> ~/.Rprofile
     mkdir -p $R_LIBS_USER
