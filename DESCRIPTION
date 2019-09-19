@@ -1,0 +1,23 @@
+Package: AzureVision
+Title: Interface to Azure Computer Vision Service
+Version: 0.0.1
+Authors@R: c(
+    person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
+    person("Microsoft", role="cph")
+    )
+Description: An interface to the Azure Computer Vision service API.
+URL: https://github.com/Azure/AzureVision https://github.com/Azure/AzureR
+BugReports: https://github.com/Azure/AzureVision/issues
+License: MIT + file LICENSE
+Depends: 
+    R (>= 3.3)
+Imports:
+    AzureRMR,
+    httr (>= 1.3)
+Suggests:
+    AzureAuth,
+    jpeg,
+    png,
+    svglite
+Roxygen: list(markdown=TRUE)
+RoxygenNote: 6.1.1
