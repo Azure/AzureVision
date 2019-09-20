@@ -53,6 +53,42 @@ add_cognitive_auth <- function(endpoint, headers)
 }
 
 
+process_cognitive_response <- function(response, handler)
+{
+    if(handler != "pass")
+    {
+        cont <- httr::content(response)
+        handler <- get(paste0(handler, "_for_status"), getNamespace("httr"))
+        handler(response, paste0("complete Cognitive Services operation. Message:\n",
+                                 sub("\\.$", "", cognitive_error_message(cont))))
+
+        cont
+    }
+    else response
+}
+
+
+cognitive_error_message <- function(cont)
+{
+    if(is.raw(cont))
+        cont <- jsonlite::fromJSON(rawToChar(cont))
+
+    msg <- if(is.character(cont))
+        cont
+    else if(is.list(cont))
+    {
+        if(is.character(cont$message))
+            cont$message
+        else if(is.list(cont$error) && is.character(cont$error$message))
+            cont$error$message
+        else ""
+    }
+    else ""
+
+    paste0(strwrap(msg), collapse="\n")
+}
+
+
 # kind - api
 # ComputerVision - vision/v2.0
 # Face - face/v1.0
