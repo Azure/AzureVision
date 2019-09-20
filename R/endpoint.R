@@ -1,10 +1,10 @@
-cognitive_endpoint <- function(url, type, key=NULL, token=NULL)
+cognitive_endpoint <- function(url, type, key=NULL, aad_token=NULL, cognitive_token=NULL)
 {
     type <- normalize_cognitive_type(type)
     url <- httr::parse_url(url)
     url$path <- get_api_path(type)
 
-    object <- list(url=url, key=key, token=token)
+    object <- list(url=url, key=key, aad_token=token, cognitive_token=cognitive_token)
     class(object) <- c(paste0(type, "_endpoint"), "cognitive_endpoint")
 
     object
@@ -33,6 +33,23 @@ call_cognitive_endpoint <- function(endpoint, operation, options=list(), headers
     res <- httr::VERB(verb, url, headers, body=body, encode=encode)
 
     process_cognitive_response(res, match.arg(http_status_handler))
+}
+
+
+add_cognitive_auth <- function(endpoint, headers)
+{
+    headers <- if(!is.null(endpoint$key))
+        c(headers, `Ocp-Apim-Subscription-Key`=endpoint$key)
+    else if(is_azure_auth(endpoint$aad_token))
+    {
+        token <- endpoint$aad_token
+        if(!token$validate())
+            token$refresh()
+        c(headers, Authorization=paste("Bearer", AzureAuth::extract_jwt(token)))
+    }
+    else stop("No supported authentication method found", call.=FALSE)
+
+    do.call(httr::add_headers, headers)
 }
 
 
