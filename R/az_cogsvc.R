@@ -1,4 +1,4 @@
-az_vision_service <- R6::R6Class("az_vision_service", inherit=AzureRMR::az_resource,
+az_cognitive_service <- R6::R6Class("az_cognitive_service", inherit=AzureRMR::az_resource,
 
 public=list(
     list_keys=function()
@@ -15,5 +15,11 @@ public=list(
     list_skus=function()
     {
         private$res_op("skus")$value
+    },
+
+    get_endpoint=function()
+    {
+        cognitive_endpoint(self$properties$endpoint, self$kind, key=self$list_keys()[1])
     }
 ))
+

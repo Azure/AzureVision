@@ -1,0 +1,63 @@
+cognitive_endpoint <- function(url, type, key=NULL, token=NULL)
+{
+    type <- normalize_cognitive_type(type)
+    url <- httr::parse_url(url)
+    url$path <- get_api_path(type)
+
+    object <- list(url=url, key=key, token=token)
+    class(object) <- c(paste0(type, "_endpoint"), "cognitive_endpoint")
+
+    object
+}
+
+
+call_cognitive_endpoint <- function(endpoint, operation, options=list(), headers=list(), body=NULL, encode="json",
+                                    http_verb=c("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"),
+                                    http_status_handler=c("stop", "warn", "message", "pass"))
+{
+    url <- endpoint$url
+    url$path <- file.path(url$path, operation)
+    url$query <- options
+
+    headers <- add_cognitive_auth(endpoint, headers)
+    if(encode == "json")
+    {
+        # manually convert to json to avoid issues with nulls
+        body <- jsonlite::toJSON(body, auto_unbox=TRUE, digits=22, null="null")
+        encode <- "raw"
+    }
+    else if(encode == "raw")
+        headers$`content-type` <- "application/octet-stream"
+
+    verb <- match.arg(http_verb)
+    res <- httr::VERB(verb, url, headers, body=body, encode=encode)
+
+    process_cognitive_response(res, match.arg(http_status_handler))
+}
+
+
+# kind - api
+# ComputerVision - vision/v2.0
+# Face - face/v1.0
+# LUIS - luis/v2.0
+# CustomVision.Training - customvision/v3.0
+# CustomVision.Prediction - customvision/v3.0
+# ContentModerator - contentmoderator/moderate/v1.0
+# Text - text/analytics/v2.0
+get_api_path <- function(type)
+{
+    switch(type,
+        computervision="vision/v2.0",
+        face="face/v1.0",
+        luis="luis/v2.0",
+        customvision=, customvision_training=, customvision_prediction="customvision/v3.0",
+        contentmoderator="contentmoderator/moderate/v1.0",
+        text="text/analytics/v2.0"
+    )
+}
+
+
+normalize_cognitive_type <- function(type)
+{
+    tolower(gsub("\\.", "_", type))
+}
