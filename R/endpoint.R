@@ -4,7 +4,7 @@ cognitive_endpoint <- function(url, type, key=NULL, aad_token=NULL, cognitive_to
     url <- httr::parse_url(url)
     url$path <- get_api_path(type)
 
-    object <- list(url=url, key=key, aad_token=token, cognitive_token=cognitive_token)
+    object <- list(url=url, key=key, aad_token=aad_token, cognitive_token=cognitive_token)
     class(object) <- c(paste0(type, "_endpoint"), "cognitive_endpoint")
 
     object
@@ -19,7 +19,6 @@ call_cognitive_endpoint <- function(endpoint, operation, options=list(), headers
     url$path <- file.path(url$path, operation)
     url$query <- options
 
-    headers <- add_cognitive_auth(endpoint, headers)
     if(encode == "json")
     {
         # manually convert to json to avoid issues with nulls
@@ -29,6 +28,7 @@ call_cognitive_endpoint <- function(endpoint, operation, options=list(), headers
     else if(encode == "raw")
         headers$`content-type` <- "application/octet-stream"
 
+    headers <- add_cognitive_auth(endpoint, headers)
     verb <- match.arg(http_verb)
     res <- httr::VERB(verb, url, headers, body=body, encode=encode)
 
@@ -39,7 +39,7 @@ call_cognitive_endpoint <- function(endpoint, operation, options=list(), headers
 add_cognitive_auth <- function(endpoint, headers)
 {
     headers <- if(!is.null(endpoint$key))
-        c(headers, `Ocp-Apim-Subscription-Key`=endpoint$key)
+        c(headers, `Ocp-Apim-Subscription-Key`=unname(endpoint$key))
     else if(is_azure_auth(endpoint$aad_token))
     {
         token <- endpoint$aad_token
