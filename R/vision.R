@@ -48,7 +48,23 @@ tag <- function(endpoint, image, language="en", ...)
 {
     body <- image_to_body(image)
     res <- call_cognitive_endpoint(endpoint, "tag", body=body, options=list(language=language), ..., http_verb="POST")
-    as_vision_response(res)
+    tags <- as_vision_response(res)$tags
+    do.call(rbind.data.frame, c(lapply(tags, function(x)
+    {
+        if(is.null(x$hint))
+            x$hint <- NA_character_
+        x
+    }), stringsAsFactors=FALSE))
+}
+
+
+categorize <- function(endpoint, image, ...)
+{
+    body <- image_to_body(image)
+    res <- call_cognitive_endpoint(endpoint, "analyze", body=body, options=list(visualFeatures="categories"), ...,
+                                   http_verb="POST")
+    cats <- as_vision_response(res)$categories
+    do.call(rbind.data.frame, c(cats, stringsAsFactors=FALSE))
 }
 
 
@@ -69,13 +85,15 @@ list_models <- function(endpoint)
 }
 
 
-make_thumbnail <- function(endpoint, image, width, height, smart_crop=TRUE, ...)
+make_thumbnail <- function(endpoint, image, width, height, smart_crop=TRUE, ..., outfile=NULL)
 {
     body <- image_to_body(image)
     res <- call_cognitive_endpoint(endpoint, "generateThumbnail", body=body,
                                    options=list(width=width, height=height, smartCropping=smart_crop), ...,
                                    http_verb="POST")
-    res
+    if(!is.null(outfile))
+        writeBin(outfile, res)
+    else res
 }
 
 
