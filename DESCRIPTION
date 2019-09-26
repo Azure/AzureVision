@@ -13,6 +13,7 @@ Depends:
     R (>= 3.3)
 Imports:
     AzureRMR,
+    AzureCognitive,
     jsonlite,
     httr (>= 1.3)
 Suggests:
@@ -22,3 +23,5 @@ Suggests:
     svglite
 Roxygen: list(markdown=TRUE)
 RoxygenNote: 6.1.1
+Remotes:
+    Azure/AzureCognitive
