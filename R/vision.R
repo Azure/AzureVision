@@ -78,7 +78,7 @@ read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", .
 }
 
 
-list_models <- function(endpoint)
+list_builtin_models <- function(endpoint)
 {
     res <- call_cognitive_endpoint(endpoint, "models")
     as_vision_response(res)
