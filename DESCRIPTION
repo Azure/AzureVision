@@ -12,7 +12,6 @@ License: MIT + file LICENSE
 Depends: 
     R (>= 3.3)
 Imports:
-    AzureRMR,
     AzureCognitive,
     jsonlite,
     httr (>= 1.3)
