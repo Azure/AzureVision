@@ -3,4 +3,3 @@
 export(call_cognitive_endpoint)
 export(cognitive_endpoint)
 import(AzureCognitive)
-import(AzureRMR)

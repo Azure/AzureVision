@@ -30,7 +30,7 @@ detect_objects <- function(endpoint, image, ...)
 detect_faces <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
-    res <- call_cognitive_endpoint(endp, "analyze", body=body, options=list(visualFeatures="faces"), ...,
+    res <- call_cognitive_endpoint(endpoint, "analyze", body=body, options=list(visualFeatures="faces"), ...,
                                    http_verb="POST")
     as_vision_response(res)
 }

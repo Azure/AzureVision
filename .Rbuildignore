@@ -8,3 +8,5 @@
 CONTRIBUTING.md
 ^LICENSE\.md$
 azure-pipelines.yml
+CODE_OF_CONDUCT.md
+SECURITY.md
