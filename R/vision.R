@@ -112,11 +112,11 @@ image_to_body <- function(image)
 
 as_vision_response <- function(res)
 {
-    structure(res, class="computer_vision_response")
+    structure(res, class="computervision_response")
 }
 
 
-print.computer_vision_response <- function(x, ...)
+print.computervision_response <- function(x, ...)
 {
     nms <- names(x)
     meta_nms <- c("requestId", "metadata")
