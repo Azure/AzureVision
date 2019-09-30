@@ -1,4 +1,32 @@
 #' @export
+computervision_endpoint <- function(url, ...)
+{
+    cognitive_endpoint(url, service_type="ComputerVision", ...)
+}
+
+
+#' @export
+customvision_training_endpoint <- function(url, ...)
+{
+    cognitive_endpoint(url, service_type="CustomVision.Training", ...)
+}
+
+
+#' @export
+customvision_prediction_endpoint <- function(url, ...)
+{
+    cognitive_endpoint(url, service_type="CustomVision.Prediction", ...)
+}
+
+
+#' @export
+face_endpoint <- function(url, ...)
+{
+    cognitive_endpoint(url, service_type="Face", ...)
+}
+
+
+#' @export
 call_cognitive_endpoint.computervision_endpoint <- function(endpoint, ...)
 {
     NextMethod()
