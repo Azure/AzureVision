@@ -1,11 +1,11 @@
 Package: AzureVision
-Title: Interface to Azure Computer Vision Service
+Title: Interface to Azure Computer Vision Services
 Version: 0.0.1
 Authors@R: c(
     person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
     person("Microsoft", role="cph")
     )
-Description: An interface to the Azure Computer Vision service API.
+Description: An interface to the Azure Computer Vision, Face Recognition, and Custom Vision client APIs.
 URL: https://github.com/Azure/AzureVision https://github.com/Azure/AzureR
 BugReports: https://github.com/Azure/AzureVision/issues
 License: MIT + file LICENSE
