@@ -1,21 +1,25 @@
+#' @export
 call_cognitive_endpoint.computervision_endpoint <- function(endpoint, ...)
 {
     NextMethod()
 }
 
 
+#' @export
 call_cognitive_endpoint.face_endpoint <- function(endpoint, ...)
 {
     NextMethod()
 }
 
 
+#' @export
 call_cognitive_endpoint.customvision_training_endpoint <- function(endpoint, ...)
 {
     NextMethod(auth_header="training-key")
 }
 
 
+#' @export
 call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, ...)
 {
     NextMethod(auth_header="prediction-key")
