@@ -1,14 +1,24 @@
+call_cognitive_endpoint.computervision_endpoint <- function(endpoint, ...)
+{
+    NextMethod()
+}
+
+
+call_cognitive_endpoint.face_endpoint <- function(endpoint, ...)
+{
+    NextMethod()
+}
+
+
 call_cognitive_endpoint.customvision_training_endpoint <- function(endpoint, ...)
 {
-    class(endpoint) <- class(endpoint)[-1]
-    call_cognitive_endpoint(endpoint, ..., auth_header="training-key")
+    NextMethod(auth_header="training-key")
 }
 
 
 call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, ...)
 {
-    class(endpoint) <- class(endpoint)[-1]
-    call_cognitive_endpoint(endpoint, ..., auth_header="prediction-key")
+    NextMethod(auth_header="prediction-key")
 }
 
 
