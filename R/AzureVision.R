@@ -6,3 +6,27 @@ AzureCognitive::cognitive_endpoint
 
 #' @export
 AzureCognitive::call_cognitive_endpoint
+
+
+confirm_delete <- function(msg, confirm)
+{
+    if(!interactive() || !confirm)
+        return(TRUE)
+
+    ok <- if(getRversion() < numeric_version("3.5.0"))
+    {
+        msg <- paste(msg, "(yes/No/cancel) ")
+        yn <- readline(msg)
+        if(nchar(yn) == 0)
+            FALSE
+        else tolower(substr(yn, 1, 1)) == "y"
+    }
+    else utils::askYesNo(msg, FALSE)
+    isTRUE(ok)
+}
+
+
+is_empty <- function(x)
+{
+    length(x) == 0
+}
