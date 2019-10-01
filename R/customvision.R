@@ -11,8 +11,6 @@ list_customvision_projects <- function(endpoint)
 
 get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 {
-    if(is.null(name) && is.null(id))
-        stop("Either name or ID must be supplied", call.=FALSE)
     if(is.null(id))
         id <- get_project_id_by_name(endpoint, name)
 
@@ -22,11 +20,11 @@ get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 }
 
 
-create_customvision_project <- function(endpoint, name, domain="general",
+create_customvision_project <- function(endpoint, name,
                                         purpose=c("classification", "object_detection"),
+                                        domain="general",
                                         multiple_labels=FALSE,
-                                        description=NULL,
-                                        ...)
+                                        description=NULL)
 {
     purpose <- match.arg(purpose)
     domain_id <- get_domain_id(domain, purpose)
@@ -51,8 +49,6 @@ create_customvision_project <- function(endpoint, name, domain="general",
 
 delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TRUE)
 {
-    if(is.null(name) && is.null(id))
-        stop("Either name or ID must be supplied", call.=FALSE)
     if(is.null(id))
         id <- get_project_id_by_name(endpoint, name)
 
@@ -62,6 +58,39 @@ delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TR
 
     call_cognitive_endpoint(endpoint, file.path("training/projects", id), http_verb="DELETE")
     invisible(NULL)
+}
+
+
+update_customvision_project <- function(endpoint, name=NULL, id=NULL,
+                                        domain="general",
+                                        multiple_labels=FALSE,
+                                        description=NULL,
+                                        export_target=c("none", "basic", "VAIDK"))
+{
+    if(is.null(id))
+        id <- get_project_id_by_name(endpoint, name)
+
+    project <- get_customvision_project(endpoint, id=id)
+    newbody <- list()
+
+    if(!is.null(name) && name != project$name)
+        newbody$name <- name
+
+    if(!missing(description))
+        newbody$description <- description
+
+    newbody$settings <- project$settings
+    purpose <- get_purpose_from_domain_id(project$settings$domainId)
+
+    if(!missing(domain))
+        newbody$settings$domainId <- get_domain_id(domain, purpose)
+
+    if(!missing(multiple_labels))
+        newbody$settings$classificationType <- if(multiple_labels) "Multilabel" else "Multiclass"
+
+    obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id), body=newbody, http_verb="PATCH")
+    class(obj) <- "customvision_project"
+    obj
 }
 
 
@@ -88,18 +117,26 @@ get_domain_id <- function(domain, purpose)
 }
 
 
+get_purpose_from_domain_id <- function(id)
+{
+    i <- which(sapply(.domain_ids, function(domains) id %in% domains))
+    names(.domain_ids)[i]
+}
+
+
 print.customvision_project <- function(x, ...)
 {
-    cat("Azure Custom Vision project '", x$name, "'\n", sep="")
-    cat("ID:", x$id, "\n")
-    cat("Settings:\n")
+    cat("Azure Custom Vision project '", x$name, "' (", x$id, ")\n", sep="")
     print(x$settings)
     invisible(x)
 }
 
 
-get_project_id_by_name <- function(endpoint, name)
+get_project_id_by_name <- function(endpoint, name=NULL)
 {
+    if(is.null(name))
+        stop("Either name or ID must be supplied", call.=FALSE)
+
     lst <- list_customvision_projects(endpoint)
     i <- which(sapply(lst, function(obj) obj$name == name))
     if(is_empty(i))
