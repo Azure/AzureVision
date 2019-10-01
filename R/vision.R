@@ -1,3 +1,4 @@
+#' @export
 analyze <- function(endpoint, image, domain=NULL, options=list(), ...)
 {
     body <- image_to_body(image)
@@ -11,6 +12,7 @@ analyze <- function(endpoint, image, domain=NULL, options=list(), ...)
 }
 
 
+#' @export
 describe <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
@@ -19,6 +21,7 @@ describe <- function(endpoint, image, ...)
 }
 
 
+#' @export
 detect_objects <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
@@ -27,6 +30,7 @@ detect_objects <- function(endpoint, image, ...)
 }
 
 
+#' @export
 detect_faces <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
@@ -36,6 +40,7 @@ detect_faces <- function(endpoint, image, ...)
 }
 
 
+#' @export
 area_of_interest <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
@@ -44,6 +49,7 @@ area_of_interest <- function(endpoint, image, ...)
 }
 
 
+#' @export
 tag <- function(endpoint, image, language="en", ...)
 {
     body <- image_to_body(image)
@@ -58,6 +64,7 @@ tag <- function(endpoint, image, language="en", ...)
 }
 
 
+#' @export
 categorize <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
@@ -68,6 +75,7 @@ categorize <- function(endpoint, image, ...)
 }
 
 
+#' @export
 read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", ...)
 {
     body <- image_to_body(image)
@@ -78,6 +86,7 @@ read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", .
 }
 
 
+#' @export
 list_builtin_models <- function(endpoint)
 {
     res <- call_cognitive_endpoint(endpoint, "models")
@@ -85,6 +94,7 @@ list_builtin_models <- function(endpoint)
 }
 
 
+#' @export
 make_thumbnail <- function(endpoint, image, width, height, smart_crop=TRUE, ..., outfile=NULL)
 {
     body <- image_to_body(image)

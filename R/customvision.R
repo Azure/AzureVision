@@ -29,6 +29,18 @@ print.customvision_project <- function(x, ...)
 }
 
 
+#' Create, read, update and delete Azure Custom Vision projects
+
+#' @param endpoint A custom vision endpoint.
+#' @param name,id The name and ID of the project.
+#' @param purpose For `create_customvision_project`, what the model will be used for: either to classify objects in an image, or to detect whether an object is present in an image. Note that this setting cannot be changed once the project is created.
+#' @param domain The broad category of images that will be used for training the model.
+#' @param export_target What formats are supported when exporting the model.
+#' @param multiple_labels Whether multiple labels for an image are allowed. The default is `FALSE`, meaning an image represents one and only one label.
+#' @param description A text description of the project.
+#'
+#' @aliases customvision_project
+#' @rdname customvision_project
 #' @export
 list_customvision_projects <- function(endpoint)
 {
@@ -41,6 +53,7 @@ list_customvision_projects <- function(endpoint)
 }
 
 
+#' @rdname customvision_project
 #' @export
 get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 {
@@ -53,6 +66,7 @@ get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 }
 
 
+#' @rdname customvision_project
 #' @export
 create_customvision_project <- function(endpoint, name,
                                         purpose=c("classification", "object_detection"),
@@ -87,6 +101,7 @@ create_customvision_project <- function(endpoint, name,
 }
 
 
+#' @rdname customvision_project
 #' @export
 delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TRUE)
 {
