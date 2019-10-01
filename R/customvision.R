@@ -1,3 +1,35 @@
+#' @export
+print.customvision_project <- function(x, ...)
+{
+    cat("Azure Custom Vision project '", x$name, "' (", x$id, ")\n", sep="")
+    domain_id <- x$settings$domainId
+    compact <- is_compact_domain(domain_id)
+
+    domains <- if(compact) unlist(.compact_domain_ids) else unlist(.domain_ids)
+    domain_name <- names(domains)[domains == domain_id]
+    if(compact)
+        domain_name <- paste0(domain_name, ".compact")
+
+    domain_name <- paste0(domain_name, " (", domain_id, ")")
+    cat("  Domain:", domain_name, "\n")
+
+    export_type <- if(!compact)
+        "none"
+    else if(is_empty(x$settings$targetExportPlatforms))
+        "basic"
+    else "Vision AI Dev Kit"
+    cat("  Export target:", export_type, "\n")
+
+    classtype <- if(get_purpose_from_domain_id(domain_id) == "object_detection")
+        NA_character_
+    else x$settings$classificationType
+    cat("  Classification type:", classtype, "\n")
+
+    invisible(x)
+}
+
+
+#' @export
 list_customvision_projects <- function(endpoint)
 {
     lst <- call_cognitive_endpoint(endpoint, "training/projects")
@@ -9,6 +41,7 @@ list_customvision_projects <- function(endpoint)
 }
 
 
+#' @export
 get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 {
     if(is.null(id))
@@ -20,6 +53,7 @@ get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 }
 
 
+#' @export
 create_customvision_project <- function(endpoint, name,
                                         purpose=c("classification", "object_detection"),
                                         domain="general",
@@ -53,6 +87,7 @@ create_customvision_project <- function(endpoint, name,
 }
 
 
+#' @export
 delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TRUE)
 {
     if(is.null(id))
@@ -67,6 +102,7 @@ delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TR
 }
 
 
+#' @export
 update_customvision_project <- function(endpoint, name=NULL, id=NULL,
                                         domain="general",
                                         export_target=c("none", "basic", "VAIDK"),
@@ -167,14 +203,6 @@ get_purpose_from_domain_id <- function(id)
 is_compact_domain <- function(id)
 {
     id %in% unlist(.compact_domain_ids)
-}
-
-
-print.customvision_project <- function(x, ...)
-{
-    cat("Azure Custom Vision project '", x$name, "' (", x$id, ")\n", sep="")
-    print(x$settings)
-    invisible(x)
 }
 
 
