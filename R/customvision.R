@@ -23,11 +23,13 @@ get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 create_customvision_project <- function(endpoint, name,
                                         purpose=c("classification", "object_detection"),
                                         domain="general",
+                                        export_target=c("none", "basic", "VAIDK"),
                                         multiple_labels=FALSE,
                                         description=NULL)
 {
     purpose <- match.arg(purpose)
-    domain_id <- get_domain_id(domain, purpose)
+    export_target <- match.arg(export_target)
+    domain_id <- get_domain_id(domain, purpose, export_target)
     type <- if(purpose == "object_detection")
         NULL
     else if(multiple_labels)
@@ -40,8 +42,12 @@ create_customvision_project <- function(endpoint, name,
         classificationType=type,
         description=description
     )
-
     obj <- call_cognitive_endpoint(endpoint, "training/projects", options=opts, http_verb="POST")
+
+    # if export target is Vision AI Dev Kit, must do a separate update
+    if(export_target == "VAIDK")
+        return(update_customvision_project(endpoint, id=obj$id, export_target="VAIDK"))
+
     class(obj) <- "customvision_project"
     obj
 }
@@ -63,9 +69,9 @@ delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TR
 
 update_customvision_project <- function(endpoint, name=NULL, id=NULL,
                                         domain="general",
+                                        export_target=c("none", "basic", "VAIDK"),
                                         multiple_labels=FALSE,
-                                        description=NULL,
-                                        export_target=c("none", "basic", "VAIDK"))
+                                        description=NULL)
 {
     if(is.null(id))
         id <- get_project_id_by_name(endpoint, name)
@@ -80,13 +86,30 @@ update_customvision_project <- function(endpoint, name=NULL, id=NULL,
         newbody$description <- description
 
     newbody$settings <- project$settings
-    purpose <- get_purpose_from_domain_id(project$settings$domainId)
 
-    if(!missing(domain))
-        newbody$settings$domainId <- get_domain_id(domain, purpose)
+    newtarget <- !missing(export_target)
+    newdomain <- !missing(domain)
+    newclasstype <- !missing(multiple_labels)
 
-    if(!missing(multiple_labels))
+    export_target <- if(newtarget)
+        match.arg(export_target)
+    else if(!is_compact_domain(project$settings$domainId))
+        "none"
+    else if(is_empty(project$settings$targetExportPlatforms))
+        "basic"
+    else "VAIDK"
+
+    if(newtarget || newdomain)
+    {
+        purpose <- get_purpose_from_domain_id(project$settings$domainId)
+        newbody$settings$domainId <- get_domain_id(domain, purpose, export_target)
+    }
+
+    if(newclasstype)
         newbody$settings$classificationType <- if(multiple_labels) "Multilabel" else "Multiclass"
+
+    if(export_target == "VAIDK")
+        newbody$settings$targetExportPlatforms <- I("VAIDK")
 
     obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id), body=newbody, http_verb="PATCH")
     class(obj) <- "customvision_project"
@@ -107,9 +130,24 @@ update_customvision_project <- function(endpoint, name=NULL, id=NULL,
     )
 )
 
-get_domain_id <- function(domain, purpose)
+.compact_domain_ids <- list(
+    classification=c(
+        general="0732100f-1a38-4e49-a514-c9b44c697ab5",
+        food="8882951b-82cd-4c32-970b-d5f8cb8bf6d7",
+        landmarks="b5cfd229-2ac7-4b2b-8d0a-2b0661344894",
+        retail="6b4faeda-8396-481b-9f8b-177b9fa3097f"
+    ),
+    object_detection=c(
+        general="a27d5ca5-bb19-49d8-a70a-fec086c47f5b"
+    )
+)
+
+
+get_domain_id <- function(domain, purpose, export_target)
 {
-    ids <- .domain_ids[[purpose]]
+    domainlst <- if(export_target == "none") .domain_ids else .compact_domain_ids
+
+    ids <- domainlst[[purpose]]
     i <- which(domain == names(ids))
     if(is_empty(i))
         stop(sprintf("Domain '%s' not found", domain), call.=FALSE)
@@ -119,8 +157,16 @@ get_domain_id <- function(domain, purpose)
 
 get_purpose_from_domain_id <- function(id)
 {
-    i <- which(sapply(.domain_ids, function(domains) id %in% domains))
-    names(.domain_ids)[i]
+    domainlst <- if(is_compact_domain(id)) .compact_domain_ids else .domain_ids
+
+    i <- which(sapply(domainlst, function(domains) id %in% domains))
+    names(domainlst)[i]
+}
+
+
+is_compact_domain <- function(id)
+{
+    id %in% unlist(.compact_domain_ids)
 }
 
 
