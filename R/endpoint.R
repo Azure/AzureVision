@@ -54,6 +54,13 @@ call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, .
 }
 
 
+do_training_op <- function(project, op, ...)
+{
+    op <- file.path("training/projects", project$project$id, op)
+    call_cognitive_endpoint(project$endpoint, op, ...)
+}
+
+
 is_any_uri <- function(string)
 {
     uri <- httr::parse_url(string)
