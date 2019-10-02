@@ -219,6 +219,21 @@ is_compact_domain <- function(id)
 }
 
 
+is_classification_project <- function(project)
+{
+    domain_id <- project$project$settings$domainId
+    domains <- if(is_compact_domain(domain_id)) unlist(.compact_domain_ids) else unlist(.domain_ids)
+    domain_name <- names(domains)[domains == domain_id]
+    substr(domain_name, 1, 5) == "class"
+}
+
+
+is_object_detection_project <- function(project)
+{
+    !is_classification_project(project)
+}
+
+
 get_project_id_by_name <- function(endpoint, name=NULL)
 {
     if(is.null(name))
