@@ -29,19 +29,19 @@ get_tag <- function(project, name=NULL, id=NULL, iteration=NULL)
 
 add_images <- function(project, images, tags=NULL, regions=NULL)
 {
-    all_files <- all(sapply(images, file.exists))
+    all_files <- all(file.exists(images))
     all_urls <- all(sapply(images, is_any_uri))
     if(!all_files && !all_urls)
         stop("Must supply either a vector of all file names or all URLs", call.=FALSE)
 
-    if(all_files)
+    imglist <- if(all_files)
         add_image_files(project, images)
     else add_image_urls(project, images)
 
     if(!is_empty(tags))
     {
         add_tags(project, unique(as.character(tags)))
-        tag_images(project, images, tags)
+        tag_uploaded_images(project, tags, sapply(imglist, function(x) x$image$id))
     }
     invisible(project)
 }
@@ -49,7 +49,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 
 add_tags <- function(project, tags)
 {
-    current_tags <- list_tags(project)
+    current_tags <- list_tags(project, as="names")
     newtags <- setdiff(tags, current_tags)
     if(!is_empty(newtags))
     {
@@ -62,18 +62,17 @@ add_tags <- function(project, tags)
 
 add_negative_tag <- function(project, negative_name="_negative_")
 {
-    taglist <- list_tags(project, as="list")
+    taglist <- list_tags(project, as="dataframe")
 
-    if(any(sapply(taglist, `[[`, "type") == "Negative"))
+    if(any(taglist$type == "Negative"))
     {
         warning("Project already has a negative tag", call.=FALSE)
         return(invisible(project))
     }
 
-    tagnames <- sapply(taglist, `[[`, "name")
-    if(negative_name %in% tagnames)
+    if(negative_name %in% taglist$name)
     {
-        tagid <- taglist[[which(negative_name == tagnames)]]$id
+        tagid <- taglist$id[which(negative_name == taglist$name)]
         do_training_op(project, file.path("tags", tagid), body=list(type="Negative"), http_verb="PATCH")
     }
     else do_training_op(project, "tags", options=list(name=negative_name, type="Negative"), http_verb="POST")
@@ -105,8 +104,14 @@ get_images <- function(project, include=c("tagged", "untagged", "both"), iterati
 }
 
 
-tag_images <- function(project, images, tags)
+tag_uploaded_images <- function(project, tags, images=NULL)
 {
+    if(is.null(images))
+        images <- get_images(project, "untagged", as="id")
+
+    tags <- mapply(function(img, tag) list(imageId=img, tagId=tag), images, tags)
+    do_training_op(project, "images/tags", body=list(tags=tags), http_verb="POST")
+    invisible(project)
 }
 
 
@@ -118,6 +123,8 @@ add_image_files <- function(project, images)
     res <- do_training_op(project, "images/files", body=list(images=images), http_verb="POST")
     if(!res$isBatchSuccessful)
         warning("Not all images were successfully added", call.=FALSE)
+
+    res$images
 }
 
 
@@ -129,5 +136,7 @@ add_image_urls <- function(project, images)
     res <- do_training_op(project, "images/urls", body=list(images=images), http_verb="POST")
     if(!res$isBatchSuccessful)
         warning("Not all images were successfully added", call.=FALSE)
+
+    res$images
 }
 
