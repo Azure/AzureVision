@@ -31,39 +31,19 @@ print.customvision_project <- function(x, ...)
 }
 
 
-#' Create, read, update and delete Azure Custom Vision projects
+#' Create, retrieve, update and delete Azure Custom Vision projects
 #'
 #' @param endpoint A custom vision endpoint.
-#' @param name,id The name and ID of the project.
+#' @param name,id The name and ID of the project. At least one of these must be specified for `get_customvision_project`, `update_customvision_project` and `delete_customvision_project`. The name is required for `create_customvision_project` (the ID will be assigned automatically).
 #' @param purpose For `create_customvision_project`, what the model will be used for: either to classify objects in an image, or to detect whether an object is present in an image. Note that this setting cannot be changed once the project is created.
-#' @param domain The broad class of images that will be used for training the model. The default "general" means the model is trained on a mix of classes.
+#' @param domain What kinds of images the model is meant to apply to. The default "general" means the model is suitable for use in a generic setting. Other, more specialised domains for classification include "food", "landmarks" and "retail"; for object detection the other possible domain is "logo".
 #' @param export_target What formats are supported when exporting the model.
-#' @param multiple_tags Whether multiple categories (tags/labels) for an image are allowed. The default is `FALSE`, meaning an image represents one and only one category.
-#' @param description A text description of the project.
+#' @param multiple_tags For classification models, Whether multiple categories (tags/labels) for an image are allowed. The default is `FALSE`, meaning an image represents one and only one category. Ignored for object detection models.
+#' @param description An optional text description of the project.
+#' @return
+#' `delete_customvision_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
 #'
 #' @aliases customvision_project
-#' @rdname customvision_project
-#' @export
-list_customvision_projects <- function(endpoint)
-{
-    lst <- call_cognitive_endpoint(endpoint, "training/projects")
-    lapply(lst, function(obj)
-        structure(list(endpoint=endpoint, project=obj), class="customvision_project"))
-}
-
-
-#' @rdname customvision_project
-#' @export
-get_customvision_project <- function(endpoint, name=NULL, id=NULL)
-{
-    if(is.null(id))
-        id <- get_project_id_by_name(endpoint, name)
-
-    obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id))
-    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
-}
-
-
 #' @rdname customvision_project
 #' @export
 create_customvision_project <- function(endpoint, name,
@@ -94,6 +74,28 @@ create_customvision_project <- function(endpoint, name,
     if(export_target == "VAIDK")
         return(update_customvision_project(endpoint, id=obj$id, export_target="VAIDK"))
 
+    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
+}
+
+
+#' @rdname customvision_project
+#' @export
+list_customvision_projects <- function(endpoint)
+{
+    lst <- call_cognitive_endpoint(endpoint, "training/projects")
+    lapply(lst, function(obj)
+        structure(list(endpoint=endpoint, project=obj), class="customvision_project"))
+}
+
+
+#' @rdname customvision_project
+#' @export
+get_customvision_project <- function(endpoint, name=NULL, id=NULL)
+{
+    if(is.null(id))
+        id <- get_project_id_by_name(endpoint, name)
+
+    obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id))
     structure(list(endpoint=endpoint, project=obj), class="customvision_project")
 }
 
