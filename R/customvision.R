@@ -1,8 +1,10 @@
 #' @export
 print.customvision_project <- function(x, ...)
 {
-    cat("Azure Custom Vision project '", x$name, "' (", x$id, ")\n", sep="")
-    domain_id <- x$settings$domainId
+    cat("Azure Custom Vision project '", x$project$name, "' (", x$project$id, ")\n", sep="")
+    cat("  Endpoint:", httr::build_url(x$endpoint$url), "\n")
+
+    domain_id <- x$project$settings$domainId
     compact <- is_compact_domain(domain_id)
 
     domains <- if(compact) unlist(.compact_domain_ids) else unlist(.domain_ids)
@@ -15,14 +17,14 @@ print.customvision_project <- function(x, ...)
 
     export_type <- if(!compact)
         "none"
-    else if(is_empty(x$settings$targetExportPlatforms))
+    else if(is_empty(x$project$settings$targetExportPlatforms))
         "basic"
     else "Vision AI Dev Kit"
     cat("  Export target:", export_type, "\n")
 
     classtype <- if(get_purpose_from_domain_id(domain_id) == "object_detection")
         NA_character_
-    else x$settings$classificationType
+    else x$project$settings$classificationType
     cat("  Classification type:", classtype, "\n")
 
     invisible(x)
@@ -30,13 +32,13 @@ print.customvision_project <- function(x, ...)
 
 
 #' Create, read, update and delete Azure Custom Vision projects
-
+#'
 #' @param endpoint A custom vision endpoint.
 #' @param name,id The name and ID of the project.
 #' @param purpose For `create_customvision_project`, what the model will be used for: either to classify objects in an image, or to detect whether an object is present in an image. Note that this setting cannot be changed once the project is created.
-#' @param domain The broad category of images that will be used for training the model.
+#' @param domain The broad class of images that will be used for training the model. The default "general" means the model is trained on a mix of classes.
 #' @param export_target What formats are supported when exporting the model.
-#' @param multiple_labels Whether multiple labels for an image are allowed. The default is `FALSE`, meaning an image represents one and only one label.
+#' @param multiple_tags Whether multiple categories (tags/labels) for an image are allowed. The default is `FALSE`, meaning an image represents one and only one category.
 #' @param description A text description of the project.
 #'
 #' @aliases customvision_project
@@ -46,10 +48,7 @@ list_customvision_projects <- function(endpoint)
 {
     lst <- call_cognitive_endpoint(endpoint, "training/projects")
     lapply(lst, function(obj)
-    {
-        class(obj) <- "customvision_project"
-        obj
-    })
+        structure(list(endpoint=endpoint, project=obj), class="customvision_project"))
 }
 
 
@@ -61,8 +60,7 @@ get_customvision_project <- function(endpoint, name=NULL, id=NULL)
         id <- get_project_id_by_name(endpoint, name)
 
     obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id))
-    class(obj) <- "customvision_project"
-    obj
+    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
 }
 
 
@@ -72,7 +70,7 @@ create_customvision_project <- function(endpoint, name,
                                         purpose=c("classification", "object_detection"),
                                         domain="general",
                                         export_target=c("none", "basic", "VAIDK"),
-                                        multiple_labels=FALSE,
+                                        multiple_tags=FALSE,
                                         description=NULL)
 {
     purpose <- match.arg(purpose)
@@ -80,7 +78,7 @@ create_customvision_project <- function(endpoint, name,
     domain_id <- get_domain_id(domain, purpose, export_target)
     type <- if(purpose == "object_detection")
         NULL
-    else if(multiple_labels)
+    else if(multiple_tags)
         "multilabel"
     else "multiclass"
 
@@ -96,8 +94,7 @@ create_customvision_project <- function(endpoint, name,
     if(export_target == "VAIDK")
         return(update_customvision_project(endpoint, id=obj$id, export_target="VAIDK"))
 
-    class(obj) <- "customvision_project"
-    obj
+    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
 }
 
 
@@ -121,7 +118,7 @@ delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TR
 update_customvision_project <- function(endpoint, name=NULL, id=NULL,
                                         domain="general",
                                         export_target=c("none", "basic", "VAIDK"),
-                                        multiple_labels=FALSE,
+                                        multiple_tags=FALSE,
                                         description=NULL)
 {
     if(is.null(id))
@@ -140,7 +137,7 @@ update_customvision_project <- function(endpoint, name=NULL, id=NULL,
 
     newtarget <- !missing(export_target)
     newdomain <- !missing(domain)
-    newclasstype <- !missing(multiple_labels)
+    newclasstype <- !missing(multiple_tags)
 
     export_target <- if(newtarget)
         match.arg(export_target)
@@ -157,14 +154,13 @@ update_customvision_project <- function(endpoint, name=NULL, id=NULL,
     }
 
     if(newclasstype)
-        newbody$settings$classificationType <- if(multiple_labels) "Multilabel" else "Multiclass"
+        newbody$settings$classificationType <- if(multiple_tags) "Multilabel" else "Multiclass"
 
     if(export_target == "VAIDK")
         newbody$settings$targetExportPlatforms <- I("VAIDK")
 
     obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id), body=newbody, http_verb="PATCH")
-    class(obj) <- "customvision_project"
-    obj
+    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
 }
 
 
@@ -227,9 +223,9 @@ get_project_id_by_name <- function(endpoint, name=NULL)
         stop("Either name or ID must be supplied", call.=FALSE)
 
     lst <- list_customvision_projects(endpoint)
-    i <- which(sapply(lst, function(obj) obj$name == name))
+    i <- which(sapply(lst, function(obj) obj$project$name == name))
     if(is_empty(i))
         stop(sprintf("Project '%s' not found", name), call.=FALSE)
 
-    lst[[i]]$id
+    lst[[i]]$project$id
 }
