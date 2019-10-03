@@ -56,6 +56,8 @@ call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, .
 
 do_training_op <- function(project, op, ...)
 {
+    if(!inherits(project, "customvision_project"))
+        stop("First argument must be a Custom Vision project", call.=FALSE)
     op <- file.path("training/projects", project$project$id, op)
     call_cognitive_endpoint(project$endpoint, op, ...)
 }

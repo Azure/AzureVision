@@ -84,7 +84,7 @@ add_negative_tag <- function(project, negative_name="_negative_")
 
 
 list_images <- function(project, include=c("both", "tagged", "untagged"), iteration=NULL,
-                       as=c("ids", "dataframe", "list"))
+                        as=c("ids", "dataframe", "list"))
 {
     include <- match.arg(include)
     as <- match.arg(as)
@@ -99,7 +99,7 @@ list_images <- function(project, include=c("both", "tagged", "untagged"), iterat
     else NULL
 
     if(as == "ids")
-        rbind.data.frame(tagged_imgs, untagged_imgs)$id
+        as.character(rbind.data.frame(tagged_imgs, untagged_imgs)$id)
     else if(as == "dataframe")
         rbind.data.frame(tagged_imgs, untagged_imgs)
     else c(tagged_imgs, untagged_imgs)
