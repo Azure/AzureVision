@@ -4,7 +4,7 @@ list_tags <- function(project, iteration=NULL, as=c("names", "dataframe", "list"
     if(as == "list")
         return(do_training_op(project, "tags", options(iterationId=iteration)))
 
-    tags <- do_training_op(project, "tags", simplifyVector=TRUE)
+    tags <- do_training_op(project, "tags", options(iterationId=iteration), simplifyVector=TRUE)
     if(as == "names")
         tags$name
     else as.data.frame(tags)
@@ -41,6 +41,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
     if(!is_empty(tags))
     {
         add_tags(project, unique(as.character(tags)))
+        tags <- get_tag_ids_from_names(tags, list_tags(project, as="dataframe"))
         tag_uploaded_images(project, tags, sapply(imglist, function(x) x$image$id))
     }
     invisible(project)
@@ -81,7 +82,7 @@ add_negative_tag <- function(project, negative_name="_negative_")
 }
 
 
-get_images <- function(project, include=c("tagged", "untagged", "both"), iteration=NULL,
+list_images <- function(project, include=c("tagged", "untagged", "both"), iteration=NULL,
                        as=c("id", "dataframe", "list"))
 {
     include <- match.arg(include)
@@ -104,12 +105,9 @@ get_images <- function(project, include=c("tagged", "untagged", "both"), iterati
 }
 
 
-tag_uploaded_images <- function(project, tags, images=NULL)
+tag_uploaded_images <- function(project, tags, images=list_images(project, "untagged", as="id"))
 {
-    if(is.null(images))
-        images <- get_images(project, "untagged", as="id")
-
-    tags <- mapply(function(img, tag) list(imageId=img, tagId=tag), images, tags)
+    tags <- data.frame(imageId=images, tagId=tags, stringsAsFactors=FALSE)
     do_training_op(project, "images/tags", body=list(tags=tags), http_verb="POST")
     invisible(project)
 }
@@ -138,5 +136,11 @@ add_image_urls <- function(project, images)
         warning("Not all images were successfully added", call.=FALSE)
 
     res$images
+}
+
+
+get_tag_ids_from_names <- function(tagnames, tagdf)
+{
+    unname(structure(tagdf$id, names=tagdf$name)[tagnames])
 }
 
