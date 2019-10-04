@@ -52,9 +52,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 add_tags <- function(project, tags)
 {
     current_tags <- list_tags(project, as="names")
-    if(is.list(tags))
-        tags <- unique(unlist(tags))
-
+    tags <- unique_tags(tags)
     newtags <- setdiff(tags, current_tags)
     if(!is_empty(newtags))
     {
@@ -111,8 +109,11 @@ list_images <- function(project, include=c("both", "tagged", "untagged"), iterat
 
 tag_uploaded_images <- function(project, tags, images=list_images(project, "untagged", as="ids"))
 {
-    unique_tags <- unique(unlist(tags))
-    add_tags(project, unique_tags)
+    if(length(tags) != length(images) || length(tags) != 1)
+        stop("Must supply tags for each image", call.=FALSE)
+
+    unique_tags <- unique_tags(tags)
+    add_tags(project, tags)
     tag_ids <- get_tag_ids_from_names(unique_tags, project)
 
     req_list <- lapply(seq_along(unique_tags), function(i)
@@ -153,6 +154,7 @@ remove_images <- function(project, images=list_images(project, "untagged", as="i
 
 remove_tags <- function(project, tags, confirm=TRUE)
 {
+    tags <- unique_tags(tags)
     if(!confirm_delete("Are you sure you want to remove tags from the project?", confirm))
         return(invisible(project))
 
@@ -203,3 +205,8 @@ get_tag_ids_from_names <- function(tagnames, project)
     unname(structure(tagdf$id, names=tagdf$name)[tagnames])
 }
 
+
+unique_tags <- function(tags)
+{
+    if(is.list(tags)) unique(unlist(tags)) else tags
+}
