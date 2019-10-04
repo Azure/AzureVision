@@ -42,7 +42,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 
     if(!is_empty(tags))
     {
-        imglist <- sapply(imglist, function(x) x$image$id)
+        imglist <- sapply(imglist, function(x) x$id)
         tag_uploaded_images(project, tags, imglist)
     }
     invisible(project)
@@ -52,6 +52,9 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 add_tags <- function(project, tags)
 {
     current_tags <- list_tags(project, as="names")
+    if(is.list(tags))
+        tags <- unique(unlist(tags))
+
     newtags <- setdiff(tags, current_tags)
     if(!is_empty(newtags))
     {
@@ -108,14 +111,19 @@ list_images <- function(project, include=c("both", "tagged", "untagged"), iterat
 
 tag_uploaded_images <- function(project, tags, images=list_images(project, "untagged", as="ids"))
 {
-    add_tags(project, tags)
+    unique_tags <- unique(unlist(tags))
+    add_tags(project, unique_tags)
+    tag_ids <- get_tag_ids_from_names(unique_tags, project)
 
-    tags <- data.frame(
-        imageId=images,
-        tagId=get_tag_ids_from_names(tags, project),
-        stringsAsFactors=FALSE
-    )
-    do_training_op(project, "images/tags", body=list(tags=tags), http_verb="POST")
+    req_list <- lapply(seq_along(unique_tags), function(i)
+    {
+        this_set <- sapply(tags, function(tags_j) unique_tags[i] %in% tags_j)
+        if(!is_empty(this_set))
+            data.frame(imageId=images[this_set], tagId=tag_ids[i], stringsAsFactors=FALSE)
+        else NULL
+    })
+
+    do_training_op(project, "images/tags", body=list(tags=do.call(rbind, req_list)), http_verb="POST")
     invisible(project)
 }
 
@@ -168,7 +176,7 @@ add_image_files <- function(project, images)
 
     # need to reorder uploading result to match original image vector
     srcs <- sapply(res, `[[`, "sourceUrl")
-    res[match(images, srcs)]
+    lapply(res[match(images, srcs)], `[[`, "image")
 }
 
 
@@ -185,7 +193,7 @@ add_image_urls <- function(project, images)
 
     # need to reorder uploading result to match original image vector
     srcs <- sapply(res, `[[`, "sourceUrl")
-    res[match(images, srcs)]
+    lapply(res[match(images, srcs)], `[[`, "image")
 }
 
 
