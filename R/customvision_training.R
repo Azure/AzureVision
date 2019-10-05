@@ -90,15 +90,17 @@ delete_model <- function(model, confirm=TRUE)
 
 publish_model <- function(model, name, prediction_resource)
 {
-    if(AzureRMR::is_resource(prediction_resource))
-        prediction_resource <- prediction_resource$id
+    if(!AzureRMR::is_resource(prediction_resource))
+        stop("Must supply an Azure prediction resource object", call.=FALSE)
 
     op <- file.path("iterations", model$id, "publish")
-    options <- list(publishName=name, predictionId=prediction_resource)
+    options <- list(publishName=name, predictionId=prediction_resource$id)
     do_training_op(model$project, op, options=options, http_verb="POST")
 
     pred_endp <- prediction_resource$properties$endpoint
-    classification_service(pred_endp, model$project$project$id, name)
+    if(is_classification_project(model$project$project))
+        classification_service(pred_endp, model$project$project$id, name)
+    else object_detection_service(pred_endp, model$project$project$id, name)
 }
 
 

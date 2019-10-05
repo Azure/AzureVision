@@ -2,9 +2,6 @@ predict.customvision_model <- function(object, images, ...)
 {
     files <- validate_images(images) == "files"
     options <- list(iterationId=object$id)
-    if(length(images) > 1)
-        warning("Predicting with the training endpoint is only for testing purposes;\n",
-                "to get multiple predictions efficiently, publish to a prediction resource", call.=FALSE)
 
     out <- if(files)
     {
@@ -29,7 +26,19 @@ predict.customvision_model <- function(object, images, ...)
 predict.classification_service <- function(object, images, save_result=FALSE, ...)
 {
     type <- validate_images(images)
-    op <- file.path("classify/iterations", object$name, if(type == "files") "image" else "imageUrl")
+    op <- file.path("classify/iterations", object$name, if(type == "files") "image" else "url")
+    if(!save_result)
+        op <- file.path(op, "nostore")
+    call_cognitive_endpoint(object$endpoint, op)
+}
+
+
+predict.object_detection_service <- function(object, images, save_result=FALSE, ...)
+{
+    type <- validate_images(images)
+    op <- file.path("detect/iterations", object$name, if(type == "files") "image" else "url")
+    if(!save_result)
+        op <- file.path(op, "nostore")
     call_cognitive_endpoint(object$endpoint, op)
 }
 
