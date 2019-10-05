@@ -1,7 +1,16 @@
-train_model <- function(project, training_method=c("quick", "advanced"), max_time=1, force=FALSE, email=NULL,
-                        wait=(training_method == "advanced"))
+print.customvision_model <- function(x, ...)
 {
-    opts <- if(match.arg(training_method) == "advanced")
+    cat("Azure Custom Vision model iteration", x$id, "\n")
+    cat("  Project:", x$project$project$name, "\n")
+    invisible(x)
+}
+
+
+train_model <- function(project, training_method=c("quick", "advanced"), max_time=1, force=FALSE, email=NULL,
+                        wait=(training_method == "quick"))
+{
+    training_method <- match.arg(training_method)
+    opts <- if(training_method == "advanced")
         list(
             trainingType="advanced",
             reservedBudgetInHours=max_time,
@@ -14,19 +23,24 @@ train_model <- function(project, training_method=c("quick", "advanced"), max_tim
 
     if(wait)
     {
+        message("Waiting for training to complete")
         interval <- 10
         for(i in 1:(max_time * (3600/interval)))
         {
+            message(".", appendLF=FALSE)
             Sys.sleep(interval)
             res <- do_training_op(project, file.path("iterations", res$id))
             if(res$status != "Training")
                 break
         }
-        if(res$status != "Completed")
-            stop("Error training model, final status '", res$status, "'", call.=FALSE)
+        message("\n")
+        if(!(res$status %in% c("Training", "Completed")))
+            stop("Unable to train model, final status '", res$status, "'", call.=FALSE)
+        if(res$status == "Training")
+            message("Training not yet completed")
     }
 
-    as_model_iteration(res, project)
+    make_model_iteration(res, project)
 }
 
 
@@ -35,7 +49,7 @@ list_models <- function(project)
     res <- do_training_op(project, "iterations")
     times <- sapply(res, function(x) x$lastModified)
     names(res) <- sapply(res, `[[`, "name")
-    lapply(res[order(times, decreasing=TRUE)], as_model_iteration, project=project)
+    lapply(res[order(times, decreasing=TRUE)], make_model_iteration, project=project)
 }
 
 
@@ -45,25 +59,59 @@ get_model <- function(project, iteration=NULL)
         iteration <- list_models(project)[[1]]$id
 
     res <- do_training_op(project, file.path("iterations", iteration))
-    as_model_iteration(res, project)
+    make_model_iteration(res, project)
 }
 
 
-show_model <- function(model=NULL)
+show_model <- function(model)
 {
     res <- do_training_op(model$project, file.path("iterations", model$id))
     structure(res, class="customvision_model_info")
 }
 
 
+training_performance <- function(model, threshold=0.5, overlap=NULL)
+{
+    op <- file.path("iterations", model$id, "performance")
+    do_training_op(model$project, op, options=list(threshold=threshold, overlapThreshold=overlap),
+                   simplifyVector=TRUE)
+}
+
+
 delete_model <- function(model, confirm=TRUE)
 {
-    if(!confirm_delete("Are you sure you want to delete the model?", confirm))
+    if(!confirm_delete("Are you sure you want to delete this model iteration?", confirm))
         return(invisible(NULL))
 
     do_training_op(model$project, file.path("iterations", model$iteration), http_verb="DELETE")
     invisible(NULL)
 }
+
+
+publish_model <- function(model, name, prediction_resource)
+{
+    if(AzureRMR::is_resource(prediction_resource))
+        prediction_resource <- prediction_resource$id
+
+    op <- file.path("iterations", model$id, "publish")
+    options <- list(publishName=name, predictionId=prediction_resource)
+    do_training_op(model$project, op, options=options, http_verb="POST")
+
+    pred_endp <- prediction_resource$properties$endpoint
+    classification_service(pred_endp, model$project$project$id, name)
+}
+
+
+unpublish_model <- function(model, confirm=TRUE)
+{
+    if(!confirm_delete("Are you sure you want to unpublish the model?", confirm))
+        return(invisible(NULL))
+
+    op <- file.path("iterations", model$id, "publish")
+    do_training_op(model$project, op, http_verb="DELETE")
+    invisible(NULL)
+}
+
 
 
 as_datetime <- function(x, format="%Y-%m-%dT%H:%M:%S", tz="UTC")
@@ -72,7 +120,7 @@ as_datetime <- function(x, format="%Y-%m-%dT%H:%M:%S", tz="UTC")
 }
 
 
-as_model_iteration <- function(iteration, project)
+make_model_iteration <- function(iteration, project)
 {
     structure(
         list(project=project, id=iteration$id),

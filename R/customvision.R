@@ -46,12 +46,40 @@ print.customvision_project <- function(x, ...)
 #' @aliases customvision_project
 #' @rdname customvision_project
 #' @export
+create_classification_project <- function(endpoint, name,
+                                          domain="general",
+                                          export_target=c("none", "basic", "VAIDK"),
+                                          multiple_tags=FALSE,
+                                          description=NULL)
+{
+    export_target <- match.arg(export_target)
+    create_customvision_project(endpoint, name, domain, export_target, multiple_tags, description,
+                                purpose="classification")
+}
+
+
+#' @rdname customvision_project
+#' @export
+create_object_detection_project <- function(endpoint, name,
+                                            domain="general",
+                                            export_target=c("none", "basic", "VAIDK"),
+                                            multiple_tags=FALSE,
+                                            description=NULL)
+{
+    export_target <- match.arg(export_target)
+    create_customvision_project(endpoint, name, domain, export_target, multiple_tags, description,
+                                purpose="object_detection")
+}
+
+
+#' @rdname customvision_project
+#' @export
 create_customvision_project <- function(endpoint, name,
-                                        purpose=c("classification", "object_detection"),
                                         domain="general",
                                         export_target=c("none", "basic", "VAIDK"),
                                         multiple_tags=FALSE,
-                                        description=NULL)
+                                        description=NULL,
+                                        purpose=c("classification", "object_detection"))
 {
     purpose <- match.arg(purpose)
     export_target <- match.arg(export_target)
@@ -74,7 +102,7 @@ create_customvision_project <- function(endpoint, name,
     if(export_target == "VAIDK")
         return(update_customvision_project(endpoint, id=obj$id, export_target="VAIDK"))
 
-    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
+    make_customvision_project(obj, endpoint)
 }
 
 
@@ -83,8 +111,7 @@ create_customvision_project <- function(endpoint, name,
 list_customvision_projects <- function(endpoint)
 {
     lst <- call_cognitive_endpoint(endpoint, "training/projects")
-    lapply(lst, function(obj)
-        structure(list(endpoint=endpoint, project=obj), class="customvision_project"))
+    lapply(lst, make_customvision_project, endpoint=endpoint)
 }
 
 
@@ -96,26 +123,11 @@ get_customvision_project <- function(endpoint, name=NULL, id=NULL)
         id <- get_project_id_by_name(endpoint, name)
 
     obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id))
-    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
+    make_customvision_project(obj, endpoint)
 }
 
 
 #' @rdname customvision_project
-#' @export
-delete_customvision_project <- function(endpoint, name=NULL, id=NULL, confirm=TRUE)
-{
-    if(is.null(id))
-        id <- get_project_id_by_name(endpoint, name)
-
-    msg <- sprintf("Are you sure you really want to delete the project '%s'?", if(!is.null(name)) name else id)
-    if(!confirm_delete(msg, confirm))
-        return(invisible(NULL))
-
-    call_cognitive_endpoint(endpoint, file.path("training/projects", id), http_verb="DELETE")
-    invisible(NULL)
-}
-
-
 #' @export
 update_customvision_project <- function(endpoint, name=NULL, id=NULL,
                                         domain="general",
@@ -162,7 +174,44 @@ update_customvision_project <- function(endpoint, name=NULL, id=NULL,
         newbody$settings$targetExportPlatforms <- I("VAIDK")
 
     obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id), body=newbody, http_verb="PATCH")
-    structure(list(endpoint=endpoint, project=obj), class="customvision_project")
+    make_customvision_project(obj, endpoint)
+}
+
+
+#' @rdname customvision_project
+#' @export
+delete_customvision_project <- function(object, ...)
+{
+    UseMethod("delete_customvision_project")
+}
+
+
+#' @export
+delete_customvision_project.customvision_training_endpoint <- function(object, name=NULL, id=NULL, confirm=TRUE, ...)
+{
+    if(is.null(id))
+        id <- get_project_id_by_name(endpoint, name)
+
+    msg <- sprintf("Are you sure you really want to delete the project '%s'?", if(!is.null(name)) name else id)
+    if(!confirm_delete(msg, confirm))
+        return(invisible(NULL))
+
+    call_cognitive_endpoint(endpoint, file.path("training/projects", id), http_verb="DELETE")
+    invisible(NULL)
+}
+
+
+#' @export
+delete_customvision_project.customvision_project <- function(object, confirm=TRUE)
+{
+    name <- object$project$name
+    id <- object$project$id
+    msg <- sprintf("Are you sure you really want to delete the project '%s'?", name)
+    if(!confirm_delete(msg, confirm))
+        return(invisible(NULL))
+
+    call_cognitive_endpoint(testproj$endpoint, file.path("training/projects", id), http_verb="DELETE")
+    invisible(NULL)
 }
 
 
@@ -221,16 +270,10 @@ is_compact_domain <- function(id)
 
 is_classification_project <- function(project)
 {
-    domain_id <- project$project$settings$domainId
+    domain_id <- project$settings$domainId
     domains <- if(is_compact_domain(domain_id)) unlist(.compact_domain_ids) else unlist(.domain_ids)
     domain_name <- names(domains)[domains == domain_id]
     substr(domain_name, 1, 5) == "class"
-}
-
-
-is_object_detection_project <- function(project)
-{
-    !is_classification_project(project)
 }
 
 
@@ -245,4 +288,18 @@ get_project_id_by_name <- function(endpoint, name=NULL)
         stop(sprintf("Project '%s' not found", name), call.=FALSE)
 
     lst[[i]]$project$id
+}
+
+
+make_customvision_project <- function(object, endpoint)
+{
+    projclass <- if(is_classification_project(object))
+        "classification_project"
+    else "object_detection_project"
+    classes <- c(projclass, "customvision_project")
+
+    if(projclass == "classification_project")
+        classes <- c(paste0(tolower(object$settings$classificationType), "_project"), classes)
+
+    structure(list(endpoint=endpoint, project=object), class=classes)
 }

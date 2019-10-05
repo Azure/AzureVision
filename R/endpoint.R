@@ -63,6 +63,16 @@ do_training_op <- function(project, op, ...)
 }
 
 
+do_prediction_op <- function(object, op, ...)
+{
+    if(!inherits(project, "customvision_predictive_service"))
+        stop("First argument must be a Custom Vision project", call.=FALSE)
+
+    op <- file.path("prediction", object$project_id, op)
+    call_cognitive_endpoint(object$endpoint, op, ...)
+}
+
+
 is_any_uri <- function(string)
 {
     uri <- httr::parse_url(string)

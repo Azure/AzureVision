@@ -1,3 +1,4 @@
+#' @export
 list_tags <- function(project, iteration=NULL, as=c("names", "ids", "dataframe", "list"))
 {
     as <- match.arg(as)
@@ -13,6 +14,7 @@ list_tags <- function(project, iteration=NULL, as=c("names", "ids", "dataframe",
 }
 
 
+#' @export
 get_tag <- function(project, name=NULL, id=NULL, iteration=NULL)
 {
     if(is.null(id))
@@ -29,14 +31,12 @@ get_tag <- function(project, name=NULL, id=NULL, iteration=NULL)
 }
 
 
+#' @export
 add_images <- function(project, images, tags=NULL, regions=NULL)
 {
-    all_files <- all(file.exists(images))
-    all_urls <- all(sapply(images, is_any_uri))
-    if(!all_files && !all_urls)
-        stop("Must supply either a vector of all file names or all URLs", call.=FALSE)
+    type <- validate_images(images)
 
-    imglist <- if(all_files)
+    imglist <- if(type == "files")
         add_image_files(project, images)
     else add_image_urls(project, images)
 
@@ -49,6 +49,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 }
 
 
+#' @export
 add_tags <- function(project, tags)
 {
     current_tags <- list_tags(project, as="names")
@@ -63,6 +64,7 @@ add_tags <- function(project, tags)
 }
 
 
+#' @export
 add_negative_tag <- function(project, negative_name="_negative_")
 {
     taglist <- list_tags(project, as="dataframe")
@@ -84,6 +86,7 @@ add_negative_tag <- function(project, negative_name="_negative_")
 }
 
 
+#' @export
 list_images <- function(project, include=c("both", "tagged", "untagged"), iteration=NULL,
                         as=c("ids", "dataframe", "list"))
 {
@@ -107,6 +110,7 @@ list_images <- function(project, include=c("both", "tagged", "untagged"), iterat
 }
 
 
+#' @export
 tag_uploaded_images <- function(project, tags, images=list_images(project, "untagged", as="ids"))
 {
     if(length(tags) != length(images) || length(tags) != 1)
@@ -129,6 +133,7 @@ tag_uploaded_images <- function(project, tags, images=list_images(project, "unta
 }
 
 
+#' @export
 untag_uploaded_images <- function(project, images=list_images(project, "tagged", as="ids"),
                                   tags=list_tags(project, as="ids"))
 {
@@ -141,6 +146,7 @@ untag_uploaded_images <- function(project, images=list_images(project, "tagged",
 }
 
 
+#' @export
 remove_images <- function(project, images=list_images(project, "untagged", as="ids"), confirm=TRUE)
 {
     if(!confirm_delete("Are you sure you want to remove images from the project?", confirm))
@@ -152,6 +158,7 @@ remove_images <- function(project, images=list_images(project, "untagged", as="i
 }
 
 
+#' @export
 remove_tags <- function(project, tags, confirm=TRUE)
 {
     tags <- unique_tags(tags)
@@ -209,4 +216,15 @@ get_tag_ids_from_names <- function(tagnames, project)
 unique_tags <- function(tags)
 {
     if(is.list(tags)) unique(unlist(tags)) else tags
+}
+
+
+validate_images <- function(images)
+{
+    all_files <- all(file.exists(images))
+    all_urls <- all(sapply(images, is_any_uri))
+    if(!all_files && !all_urls)
+        stop("Must supply either a vector of all file names or all URLs", call.=FALSE)
+
+    if(all_files) "files" else "urls"
 }
