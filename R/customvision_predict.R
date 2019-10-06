@@ -1,25 +1,24 @@
 predict.customvision_model <- function(object, images, ...)
 {
-    files <- validate_images(images) == "files"
-    options <- list(iterationId=object$id)
+    images <- images_to_bodies(images)
+    opts <- list(iterationId=object$id)
 
-    out <- if(files)
+    out <- if(!is.null(images[[1]]$content))
     {
-        mapply(function(f, size)
-            do_training_op(object$project, "quicktest/image", options=options, body=readBin(f, "raw", size),
-                           http_verb="POST",
-                           simplifyVector=TRUE),
-            images, file.size(images), SIMPLIFY=FALSE)
-    }
-    else
-    {
-        lapply(files, function(f)
-            do_training_op(object$project, "quicktest/url", options=options, body=list(url=f),
+        lapply(images, function(f)
+            do_training_op(object$project, "quicktest/image", options=opts, body=f$content,
                            http_verb="POST",
                            simplifyVector=TRUE))
     }
-    names(out) <- images
-    lapply(out, function(x) x$predictions)
+    else
+    {
+        lapply(images, function(f)
+            do_training_op(object$project, "quicktest/url", options=opts, body=f,
+                           http_verb="POST",
+                           simplifyVector=TRUE))
+    }
+    names(out) <- names(images)
+    lapply(out, `[[`, "predictions")
 }
 
 

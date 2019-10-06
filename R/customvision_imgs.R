@@ -34,18 +34,25 @@ get_tag <- function(project, name=NULL, id=NULL, iteration=NULL)
 #' @export
 add_images <- function(project, images, tags=NULL, regions=NULL)
 {
-    type <- validate_images(images)
+    images <- images_to_bodies(images)
+    op <- if(is.null(images[[1]]$contents)) "images/urls" else "images/files"
+    str(images)
 
-    imglist <- if(type == "files")
-        add_image_files(project, images)
-    else add_image_urls(project, images)
+    res <- do_training_op(project, op, body=list(images=unname(images)), http_verb="POST")
+    if(!res$isBatchSuccessful)
+        stop("Not all images were successfully added", call.=FALSE)
 
+    res <- res$images
+
+    srcs <- sapply(res, `[[`, "sourceUrl")
+    # need to reorder uploading result to match original image vector
+    res <- lapply(res[match(names(images), srcs)], `[[`, "image")
+
+    img_ids <- sapply(res, function(x) x$id)
     if(!is_empty(tags))
-    {
-        imglist <- sapply(imglist, function(x) x$id)
-        tag_uploaded_images(project, tags, imglist)
-    }
-    invisible(project)
+        tag_uploaded_images(project, tags, img_ids)
+
+    img_ids
 }
 
 
@@ -60,7 +67,7 @@ add_tags <- function(project, tags)
         lapply(newtags, function(tag)
             do_training_op(project, "tags", options=list(name=tag), http_verb="POST"))
     }
-    invisible(project)
+    list_tags(project, as="dataframe")
 }
 
 
@@ -82,13 +89,13 @@ add_negative_tag <- function(project, negative_name="_negative_")
     }
     else do_training_op(project, "tags", options=list(name=negative_name, type="Negative"), http_verb="POST")
 
-    invisible(project)
+    list_tags(project, as="dataframe")
 }
 
 
 #' @export
-list_images <- function(project, include=c("both", "tagged", "untagged"), iteration=NULL,
-                        as=c("ids", "dataframe", "list"))
+list_images <- function(project, include=c("all", "tagged", "untagged"), as=c("ids", "dataframe", "list"),
+                        iteration=NULL)
 {
     include <- match.arg(include)
     as <- match.arg(as)
@@ -103,9 +110,12 @@ list_images <- function(project, include=c("both", "tagged", "untagged"), iterat
     else NULL
 
     if(as == "ids")
-        as.character(rbind.data.frame(tagged_imgs, untagged_imgs)$id)
+        as.character(c(tagged_imgs$id, untagged_imgs$id))
     else if(as == "dataframe")
+    {
+        untagged_imgs$tags <- NA
         rbind.data.frame(tagged_imgs, untagged_imgs)
+    }
     else c(tagged_imgs, untagged_imgs)
 }
 
@@ -113,12 +123,15 @@ list_images <- function(project, include=c("both", "tagged", "untagged"), iterat
 #' @export
 tag_uploaded_images <- function(project, tags, images=list_images(project, "untagged", as="ids"))
 {
-    if(length(tags) != length(images) || length(tags) != 1)
+    if(length(tags) != length(images) && length(tags) != 1)
         stop("Must supply tags for each image", call.=FALSE)
 
     unique_tags <- unique_tags(tags)
-    add_tags(project, tags)
+    add_tags(project, unique_tags)
     tag_ids <- get_tag_ids_from_names(unique_tags, project)
+
+    if(length(tags) == 1)
+        tags <- rep(tags, length(images))
 
     req_list <- lapply(seq_along(unique_tags), function(i)
     {
@@ -172,40 +185,6 @@ remove_tags <- function(project, tags, confirm=TRUE)
 }
 
 
-add_image_files <- function(project, images)
-{
-    imglist <- lapply(images, function(img)
-        list(name=img, contents=readBin(img, "raw", file.info(img)$size))
-    )
-    res <- do_training_op(project, "images/files", body=list(images=imglist), http_verb="POST")
-    if(!res$isBatchSuccessful)
-        stop("Not all images were successfully added", call.=FALSE)
-
-    res <- res$images
-
-    # need to reorder uploading result to match original image vector
-    srcs <- sapply(res, `[[`, "sourceUrl")
-    lapply(res[match(images, srcs)], `[[`, "image")
-}
-
-
-add_image_urls <- function(project, images)
-{
-    imglist <- lapply(images, function(img)
-        list(url=img)
-    )
-    res <- do_training_op(project, "images/urls", body=list(images=imglist), http_verb="POST")
-    if(!res$isBatchSuccessful)
-        stop("Not all images were successfully added", call.=FALSE)
-
-    res <- res$images
-
-    # need to reorder uploading result to match original image vector
-    srcs <- sapply(res, `[[`, "sourceUrl")
-    lapply(res[match(images, srcs)], `[[`, "image")
-}
-
-
 get_tag_ids_from_names <- function(tagnames, project)
 {
     tagdf <- list_tags(project, as="dataframe")
@@ -219,12 +198,3 @@ unique_tags <- function(tags)
 }
 
 
-validate_images <- function(images)
-{
-    all_files <- all(file.exists(images))
-    all_urls <- all(sapply(images, is_any_uri))
-    if(!all_files && !all_urls)
-        stop("Must supply either a vector of all file names or all URLs", call.=FALSE)
-
-    if(all_files) "files" else "urls"
-}

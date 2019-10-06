@@ -116,7 +116,55 @@ image_to_body <- function(image)
     else if(is_any_uri(image))
         list(url=image)
     else stop("Could not find image", call.=FALSE)
+}
 
+
+# vectorised form of the above, checks that all images are raw/filename/URL
+images_to_bodies <- function(images)
+{
+    type <- image_type(images)
+    if(type == "raw" && is.raw(images))
+        images <- list(images)
+
+    # returned list will be named
+    names(images) <- if(type == "raw") seq_along(images) else images
+
+    switch(type,
+        raw=mapply(
+            function(conts, name) list(name=name, contents=conts),
+            images,
+            names(images),
+            SIMPLIFY=FALSE
+        ),
+
+        files=mapply(
+            function(f, size) list(name=f, contents=readBin(f, "raw", size)),
+            images,
+            file.size(images),
+            SIMPLIFY=FALSE
+        ),
+
+        urls=lapply(images, function(f) list(url=f))
+    )
+}
+
+
+image_type <- function(images)
+{
+    all_raw <- is.raw(images) || (is.list(images) && all(sapply(images, is.raw)))
+
+    all_files <- if(!all_raw)
+        all(file.exists(images))
+    else FALSE
+
+    all_urls <- if(!all_raw && !all_files)
+        all(sapply(images, is_any_uri))
+    else FALSE
+
+    if(!all_files && !all_urls && !all_raw)
+        stop("All image inputs must be of the same type: filenames, URLs or raw vectors", call.=FALSE)
+
+    if(all_raw) "raw" else if(all_files) "files" else "urls"
 }
 
 

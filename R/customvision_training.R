@@ -95,7 +95,7 @@ publish_model <- function(model, name, prediction_resource)
 
     op <- file.path("iterations", model$id, "publish")
     options <- list(publishName=name, predictionId=prediction_resource$id)
-    do_training_op(model$project, op, options=options, http_verb="POST")
+    return(do_training_op(model$project, op, options=options, http_verb="POST", http_status_handler="pass"))
 
     pred_endp <- prediction_resource$properties$endpoint
     if(is_classification_project(model$project$project))
