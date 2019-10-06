@@ -14,7 +14,6 @@ Depends:
 Imports:
     AzureRMR,
     AzureCognitive,
-    jsonlite,
     httr,
     utils
 Suggests:

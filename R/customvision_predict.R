@@ -57,7 +57,7 @@ classification_service <- function(endpoint, project, name)
 }
 
 
-object_detection_service <- function(endpoint, name)
+object_detection_service <- function(endpoint, project, name)
 {
     if(inherits(project, "object_detection_project"))
         project <- project$project$id

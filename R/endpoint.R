@@ -65,8 +65,8 @@ do_training_op <- function(project, op, ...)
 
 do_prediction_op <- function(object, op, ...)
 {
-    if(!inherits(project, "customvision_predictive_service"))
-        stop("First argument must be a Custom Vision project", call.=FALSE)
+    if(!inherits(object, "customvision_predictive_service"))
+        stop("First argument must be a Custom Vision predictive service", call.=FALSE)
 
     op <- file.path("prediction", object$project_id, op)
     call_cognitive_endpoint(object$endpoint, op, ...)

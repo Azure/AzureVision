@@ -190,13 +190,13 @@ delete_customvision_project <- function(object, ...)
 delete_customvision_project.customvision_training_endpoint <- function(object, name=NULL, id=NULL, confirm=TRUE, ...)
 {
     if(is.null(id))
-        id <- get_project_id_by_name(endpoint, name)
+        id <- get_project_id_by_name(object, name)
 
     msg <- sprintf("Are you sure you really want to delete the project '%s'?", if(!is.null(name)) name else id)
     if(!confirm_delete(msg, confirm))
         return(invisible(NULL))
 
-    call_cognitive_endpoint(endpoint, file.path("training/projects", id), http_verb="DELETE")
+    call_cognitive_endpoint(object, file.path("training/projects", id), http_verb="DELETE")
     invisible(NULL)
 }
 
@@ -210,7 +210,7 @@ delete_customvision_project.customvision_project <- function(object, confirm=TRU
     if(!confirm_delete(msg, confirm))
         return(invisible(NULL))
 
-    call_cognitive_endpoint(testproj$endpoint, file.path("training/projects", id), http_verb="DELETE")
+    call_cognitive_endpoint(object$endpoint, file.path("training/projects", id), http_verb="DELETE")
     invisible(NULL)
 }
 
