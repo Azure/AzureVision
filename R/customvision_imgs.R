@@ -81,17 +81,17 @@ add_negative_tag <- function(project, negative_name="_negative_")
     if(any(taglist$type == "Negative"))
     {
         warning("Project already has a negative tag", call.=FALSE)
-        return(invisible(project))
+        return(NULL)
     }
 
-    if(negative_name %in% taglist$name)
+    res <- if(negative_name %in% taglist$name)
     {
         tagid <- taglist$id[which(negative_name == taglist$name)]
         do_training_op(project, file.path("tags", tagid), body=list(type="Negative"), http_verb="PATCH")
     }
     else do_training_op(project, "tags", options=list(name=negative_name, type="Negative"), http_verb="POST")
 
-    list_tags(project, as="dataframe")
+    data.frame(res[c("name", "id")], stringsAsFactors=FALSE)
 }
 
 
@@ -161,7 +161,7 @@ untag_uploaded_images <- function(project, images=list_images(project, "tagged",
     opts <- list(imageIds=images, tagIds=tags)
 
     do_training_op(project, "images/tags", options=opts, http_verb="DELETE")
-    invisible(NULL)
+    invisible(images)
 }
 
 
@@ -173,7 +173,7 @@ remove_images <- function(project, images=list_images(project, "untagged", as="i
 
     images <- paste0(images, collapse=",")
     do_training_op(project, "images", options=list(imageIds=images), http_verb="DELETE")
-    invisible(project)
+    invisible(NULL)
 }
 
 
@@ -187,7 +187,7 @@ remove_tags <- function(project, tags, confirm=TRUE)
     lapply(get_tag_ids_from_names(tags, project), function(tag)
         do_training_op(project, file.path("tags", tag), http_verb="DELETE"))
 
-    invisible(project)
+    invisible(NULL)
 }
 
 
