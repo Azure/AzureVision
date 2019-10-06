@@ -36,7 +36,6 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 {
     images <- images_to_bodies(images)
     op <- if(is.null(images[[1]]$contents)) "images/urls" else "images/files"
-    str(images)
 
     res <- do_training_op(project, op, body=list(images=unname(images)), http_verb="POST")
     if(!res$isBatchSuccessful)
@@ -62,12 +61,15 @@ add_tags <- function(project, tags)
     current_tags <- list_tags(project, as="names")
     tags <- unique_tags(tags)
     newtags <- setdiff(tags, current_tags)
-    if(!is_empty(newtags))
-    {
-        lapply(newtags, function(tag)
-            do_training_op(project, "tags", options=list(name=tag), http_verb="POST"))
-    }
-    list_tags(project, as="dataframe")
+    if(is_empty(newtags))
+        return(NULL)
+
+    res <- lapply(newtags, function(tag)
+        do_training_op(project, "tags", options=list(name=tag), http_verb="POST"))
+
+    do.call(rbind.data.frame, c(stringsAsFactors=FALSE,
+        lapply(res, function(x) x[c("name", "id")]))
+    )
 }
 
 
@@ -113,7 +115,8 @@ list_images <- function(project, include=c("all", "tagged", "untagged"), as=c("i
         as.character(c(tagged_imgs$id, untagged_imgs$id))
     else if(as == "dataframe")
     {
-        untagged_imgs$tags <- NA
+        if(is.data.frame(untagged_imgs) && nrow(untagged_imgs) > 0)
+            untagged_imgs$tags <- NA
         rbind.data.frame(tagged_imgs, untagged_imgs)
     }
     else c(tagged_imgs, untagged_imgs)
@@ -125,6 +128,9 @@ tag_uploaded_images <- function(project, tags, images=list_images(project, "unta
 {
     if(length(tags) != length(images) && length(tags) != 1)
         stop("Must supply tags for each image", call.=FALSE)
+
+    if(any(is_guid(tags)))
+        warning("'tags' argument should be tag names (did you supply a list of image IDs?)", call.=FALSE)
 
     unique_tags <- unique_tags(tags)
     add_tags(project, unique_tags)
@@ -142,7 +148,7 @@ tag_uploaded_images <- function(project, tags, images=list_images(project, "unta
     })
 
     do_training_op(project, "images/tags", body=list(tags=do.call(rbind, req_list)), http_verb="POST")
-    invisible(project)
+    invisible(images)
 }
 
 
@@ -155,7 +161,7 @@ untag_uploaded_images <- function(project, images=list_images(project, "tagged",
     opts <- list(imageIds=images, tagIds=tags)
 
     do_training_op(project, "images/tags", options=opts, http_verb="DELETE")
-    invisible(project)
+    invisible(NULL)
 }
 
 

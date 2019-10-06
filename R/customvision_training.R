@@ -90,7 +90,7 @@ delete_model <- function(model, confirm=TRUE)
 
 publish_model <- function(model, name, prediction_resource)
 {
-    if(!AzureRMR::is_resource(prediction_resource))
+    if(!is_resource(prediction_resource))
         stop("Must supply an Azure prediction resource object", call.=FALSE)
 
     op <- file.path("iterations", model$id, "publish")

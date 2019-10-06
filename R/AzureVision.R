@@ -1,3 +1,4 @@
+#' @import AzureRMR
 #' @import AzureCognitive
 NULL
 
@@ -25,8 +26,3 @@ confirm_delete <- function(msg, confirm)
     isTRUE(ok)
 }
 
-
-is_empty <- function(x)
-{
-    length(x) == 0
-}

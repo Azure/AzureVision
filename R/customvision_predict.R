@@ -24,7 +24,7 @@ predict.customvision_model <- function(object, images, ...)
 
 predict.classification_service <- function(object, images, save_result=FALSE, ...)
 {
-    type <- validate_images(images)
+    type <- image_type(images)
     op <- file.path("classify/iterations", object$name, if(type == "files") "image" else "url")
     if(!save_result)
         op <- file.path(op, "nostore")
@@ -34,7 +34,7 @@ predict.classification_service <- function(object, images, save_result=FALSE, ..
 
 predict.object_detection_service <- function(object, images, save_result=FALSE, ...)
 {
-    type <- validate_images(images)
+    type <- image_type(images)
     op <- file.path("detect/iterations", object$name, if(type == "files") "image" else "url")
     if(!save_result)
         op <- file.path(op, "nostore")
