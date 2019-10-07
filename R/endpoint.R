@@ -19,11 +19,11 @@ customvision_prediction_endpoint <- function(url, ...)
 }
 
 
-#' @export
-face_endpoint <- function(url, ...)
-{
-    cognitive_endpoint(url, service_type="Face", ...)
-}
+# #' @export
+# face_endpoint <- function(url, ...)
+# {
+#     cognitive_endpoint(url, service_type="Face", ...)
+# }
 
 
 #' @export
@@ -33,24 +33,24 @@ call_cognitive_endpoint.computervision_endpoint <- function(endpoint, ...)
 }
 
 
+# #' @export
+# call_cognitive_endpoint.face_endpoint <- function(endpoint, ...)
+# {
+#     NextMethod()
+# }
+
+
 #' @export
-call_cognitive_endpoint.face_endpoint <- function(endpoint, ...)
+call_cognitive_endpoint.customvision_training_endpoint <- function(endpoint, ..., auth_header="training-key")
 {
-    NextMethod()
+    NextMethod(auth_header=auth_header)
 }
 
 
 #' @export
-call_cognitive_endpoint.customvision_training_endpoint <- function(endpoint, ...)
+call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, ..., auth_header="prediction-key")
 {
-    NextMethod(auth_header="training-key")
-}
-
-
-#' @export
-call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, ...)
-{
-    NextMethod(auth_header="prediction-key")
+    NextMethod(auth_header=auth_header)
 }
 
 

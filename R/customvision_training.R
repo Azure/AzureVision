@@ -1,3 +1,4 @@
+#' @export
 print.customvision_model <- function(x, ...)
 {
     cat("Azure Custom Vision model iteration", x$id, "\n")
@@ -6,6 +7,7 @@ print.customvision_model <- function(x, ...)
 }
 
 
+#' @export
 train_model <- function(project, training_method=c("quick", "advanced"), max_time=1, force=FALSE, email=NULL,
                         wait=(training_method == "quick"))
 {
@@ -44,6 +46,7 @@ train_model <- function(project, training_method=c("quick", "advanced"), max_tim
 }
 
 
+#' @export
 list_models <- function(project)
 {
     res <- do_training_op(project, "iterations")
@@ -53,6 +56,7 @@ list_models <- function(project)
 }
 
 
+#' @export
 get_model <- function(project, iteration=NULL)
 {
     if(is.null(iteration))
@@ -63,6 +67,7 @@ get_model <- function(project, iteration=NULL)
 }
 
 
+#' @export
 show_model <- function(model)
 {
     res <- do_training_op(model$project, file.path("iterations", model$id))
@@ -70,6 +75,7 @@ show_model <- function(model)
 }
 
 
+#' @export
 training_performance <- function(model, threshold=0.5, overlap=NULL)
 {
     op <- file.path("iterations", model$id, "performance")
@@ -78,6 +84,7 @@ training_performance <- function(model, threshold=0.5, overlap=NULL)
 }
 
 
+#' @export
 delete_model <- function(model, confirm=TRUE)
 {
     if(!confirm_delete("Are you sure you want to delete this model iteration?", confirm))
@@ -88,6 +95,7 @@ delete_model <- function(model, confirm=TRUE)
 }
 
 
+#' @export
 publish_model <- function(model, name, prediction_resource)
 {
     if(!is_resource(prediction_resource))
@@ -104,6 +112,7 @@ publish_model <- function(model, name, prediction_resource)
 }
 
 
+#' @export
 unpublish_model <- function(model, confirm=TRUE)
 {
     if(!confirm_delete("Are you sure you want to unpublish the model?", confirm))
