@@ -108,6 +108,7 @@ remove_images <- function(project, image_ids=list_images(project, "untagged", as
 #' @param negative_name For `add_negative_tag`, the label to provide a negative tag. See 'Negative tags' below.
 #' @param as For `list_tags`, the format in which to return results: a vector of tag names, a vector of tag IDs, a data frame of metadata, or a list of metadata.
 #' @param iteration For `list_tags` and `get_tag`, the iteration ID (roughly, which model generation to use). Defaults to the latest iteration.
+#' @param confirm For `remove_tags`, whether to ask for confirmation first.
 #' @details
 #' _Tags_ are the labels attached to images for use in classification projects. An image can have one or multiple tags associated with it; however, the latter only makes sense if the project is setup for multi-label classification.
 #'
@@ -118,7 +119,7 @@ remove_images <- function(project, image_ids=list_images(project, "untagged", as
 #'
 #' You can add a negative tag to a project with the `add_negative_tag` method. Once defined, a negative tag is treated like any other tag. A project can only have one negative tag defined.
 #' @seealso
-#' ['tag_uploaded_images'], ['untag_uploaded_images']
+#' [`tag_uploaded_images`], [`untag_uploaded_images`]
 #' @rdname customvision_tag
 #' @export
 add_tags <- function(project, tags)
@@ -196,6 +197,33 @@ get_tag <- function(project, name=NULL, id=NULL, iteration=NULL)
 }
 
 
+#' @rdname customvision_tag
+#' @export
+remove_tags <- function(project, tags, confirm=TRUE)
+{
+    tags <- unique_tags(tags)
+    if(!confirm_delete("Are you sure you want to remove tags from the project?", confirm))
+        return(invisible(project))
+
+    lapply(get_tag_ids_from_names(tags, project), function(tag)
+        do_training_op(project, file.path("tags", tag), http_verb="DELETE"))
+
+    invisible(NULL)
+}
+
+
+#' Tag and untag images uploaded to a project
+#'
+#' @param project a Custom Vision project.
+#' @param tags For `tag_uploaded_images`, the tag labels to add to the images. For `untag_uploaded_images`, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.
+#' @param image_ids The IDs of the images to tag or untag.
+#' @details
+#' `tag_uploaded_images` is for tagging images that were uploaded previously, while `untag_uploaded_images` untags them. Adding tags does not remove previously assigned ones. Similarly, removing one tag from an image leaves any other tags intact.
+#' @return
+#' The vector of IDs for the images affected, invisibly.
+#' @seealso
+#' [`add_images`], [`list_tags`]
+#' @rdname customvision_tag_image
 #' @export
 tag_uploaded_images <- function(project, tags, image_ids=list_images(project, "untagged", as="ids"))
 {
@@ -227,30 +255,22 @@ tag_uploaded_images <- function(project, tags, image_ids=list_images(project, "u
 }
 
 
+#' @rdname customvision_tag_image
 #' @export
 untag_uploaded_images <- function(project, image_ids=list_images(project, "tagged", as="ids"),
                                   tags=list_tags(project, as="ids"))
 {
+    if(!all(is_guid(tags)))
+    {
+        taglist <- list_tags(project, as="dataframe")[c("name", "id")]
+        tags <- taglist$id[match(tags, taglist$name)]
+    }
     opts <- list(
         imageIds=paste0(image_ids, collapse=","),
         tagIds=paste0(tags, collapse=",")
     )
     do_training_op(project, "images/tags", options=opts, http_verb="DELETE")
     invisible(image_ids)
-}
-
-
-#' @export
-remove_tags <- function(project, tags, confirm=TRUE)
-{
-    tags <- unique_tags(tags)
-    if(!confirm_delete("Are you sure you want to remove tags from the project?", confirm))
-        return(invisible(project))
-
-    lapply(get_tag_ids_from_names(tags, project), function(tag)
-        do_training_op(project, file.path("tags", tag), http_verb="DELETE"))
-
-    invisible(NULL)
 }
 
 

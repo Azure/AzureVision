@@ -5,6 +5,7 @@
 \alias{add_negative_tag}
 \alias{list_tags}
 \alias{get_tag}
+\alias{remove_tags}
 \title{Add, retrieve and remove tags for a project}
 \usage{
 add_tags(project, tags)
@@ -15,6 +16,8 @@ list_tags(project, as = c("names", "ids", "dataframe", "list"),
   iteration = NULL)
 
 get_tag(project, name = NULL, id = NULL, iteration = NULL)
+
+remove_tags(project, tags, confirm = TRUE)
 }
 \arguments{
 \item{project}{A Custom Vision project.}
@@ -28,6 +31,8 @@ get_tag(project, name = NULL, id = NULL, iteration = NULL)
 \item{iteration}{For \code{list_tags} and \code{get_tag}, the iteration ID (roughly, which model generation to use). Defaults to the latest iteration.}
 
 \item{name, id}{For \code{get_tag}, the name (text string) for a tag, and its ID. Provide one or the other, but not both.}
+
+\item{confirm}{For \code{remove_tags}, whether to ask for confirmation first.}
 }
 \description{
 Add, retrieve and remove tags for a project
@@ -45,5 +50,5 @@ You can add a negative tag to a project with the \code{add_negative_tag} method.
 }
 
 \seealso{
-\link{'tag_uploaded_images'}, \link{'untag_uploaded_images'}
+\code{\link{tag_uploaded_images}}, \code{\link{untag_uploaded_images}}
 }
