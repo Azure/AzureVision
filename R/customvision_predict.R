@@ -18,28 +18,37 @@ predict.customvision_model <- function(object, images, type=c("class", "prob", "
                            http_verb="POST",
                            simplifyVector=TRUE))
     }
-    names(out) <- names(images)
-    normalize_predictions(lapply(out, `[[`, "predictions"), type)
+
+    lapply(out, `[[`, "predictions")
 }
 
 
 predict.classification_service <- function(object, images, save_result=FALSE, ...)
 {
-    type <- image_type(images)
-    op <- file.path("classify/iterations", object$name, if(type == "files") "image" else "url")
-    if(!save_result)
-        op <- file.path(op, "nostore")
-    call_cognitive_endpoint(object$endpoint, op)
+    customvision_predict_internal(object, images, save_result, verb="classify")
 }
 
 
 predict.object_detection_service <- function(object, images, save_result=FALSE, ...)
 {
-    type <- image_type(images)
-    op <- file.path("detect/iterations", object$name, if(type == "files") "image" else "url")
+    customvision_predict_internal(object, images, save_result, verb="detect")
+}
+
+
+customvision_predict_internal <- function(object, images, save_result, verb)
+{
+    images <- images_to_bodies(images)
+    files <- !is.null(images[[1]]$content)
+    op <- file.path(verb, "iterations", object$name, if(files) "image" else "url")
     if(!save_result)
         op <- file.path(op, "nostore")
-    call_cognitive_endpoint(object$endpoint, op)
+
+    out <- if(files)
+        lapply(images, function(f)
+            do_prediction_op(object, op, body=f$content, http_verb="POST", simplifyVector=TRUE))
+    else lapply(images, function(f)
+        do_prediction_op(object, op, body=f, http_verb="POST", simplifyVector=TRUE))
+    out
 }
 
 
@@ -47,8 +56,8 @@ classification_service <- function(endpoint, project, name)
 {
     if(inherits(project, "classification_project"))
         project <- project$project$id
-    else if(!is.character(project))
-        stop("Must supply a classification project", call.=FALSE)
+    else if(!is_guid(project))
+        stop("Must supply a classification project object or ID", call.=FALSE)
 
     structure(
         list(endpoint=endpoint, project=project, name=name),
@@ -61,8 +70,8 @@ object_detection_service <- function(endpoint, project, name)
 {
     if(inherits(project, "object_detection_project"))
         project <- project$project$id
-    else if(!is.character(project))
-        stop("Must supply an object detection project", call.=FALSE)
+    else if(!is_guid(project))
+        stop("Must supply an object detection project object or ID", call.=FALSE)
 
     structure(
         list(endpoint=endpoint, project=project, name=name),

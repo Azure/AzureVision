@@ -1,3 +1,12 @@
+#' Endpoint objects for computer vision services
+#'
+#' @param url The URL of the endpoint.
+#' @param ... Other arguments to pass to [`AzureCognitive::cognitive_endpoint`].
+#' @return
+#' An object inheriting from `cognitive_endpoint`. The subclass indicates the type of service/endpoint: Computer Vision, Custom Vision training, or Custom Vision prediction.
+#' @seealso
+#' [`cognitive_endpoint`], [`call_cognitive_endpoint`]
+#' @rdname endpoint
 #' @export
 computervision_endpoint <- function(url, ...)
 {
@@ -5,6 +14,7 @@ computervision_endpoint <- function(url, ...)
 }
 
 
+#' @rdname endpoint
 #' @export
 customvision_training_endpoint <- function(url, ...)
 {
@@ -12,6 +22,7 @@ customvision_training_endpoint <- function(url, ...)
 }
 
 
+#' @rdname endpoint
 #' @export
 customvision_prediction_endpoint <- function(url, ...)
 {
@@ -67,8 +78,7 @@ do_prediction_op <- function(object, op, ...)
 {
     if(!inherits(object, "customvision_predictive_service"))
         stop("First argument must be a Custom Vision predictive service", call.=FALSE)
-
-    op <- file.path("prediction", object$project_id, op)
+    op <- file.path("prediction", object$project, op)
     call_cognitive_endpoint(object$endpoint, op, ...)
 }
 
