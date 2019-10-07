@@ -1,5 +1,6 @@
-predict.customvision_model <- function(object, images, ...)
+predict.customvision_model <- function(object, images, type=c("class", "prob", "list"), ...)
 {
+    type <- match.arg(type)
     images <- images_to_bodies(images)
     opts <- list(iterationId=object$id)
 
@@ -18,7 +19,7 @@ predict.customvision_model <- function(object, images, ...)
                            simplifyVector=TRUE))
     }
     names(out) <- names(images)
-    lapply(out, `[[`, "predictions")
+    normalize_predictions(lapply(out, `[[`, "predictions"), type)
 }
 
 
@@ -69,3 +70,8 @@ object_detection_service <- function(endpoint, project, name)
     )
 }
 
+
+normalize_predictions <- function(lst, type)
+{
+    labels <- lst[[1]]$name
+}

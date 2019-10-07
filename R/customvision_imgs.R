@@ -283,7 +283,52 @@ get_tag_ids_from_names <- function(tagnames, project)
 
 unique_tags <- function(tags)
 {
-    if(is.list(tags)) unique(unlist(tags)) else tags
+    if(is.list(tags)) unique(unlist(tags)) else unique(tags)
+}
+
+
+# vectorised form of image_to_body, checks that all images are raw/filename/URL
+images_to_bodies <- function(images)
+{
+    type <- image_type(images)
+    if(type == "raw" && is.raw(images))
+        images <- list(images)
+
+    # returned list will be named
+    names(images) <- if(type == "raw") seq_along(images) else images
+
+    switch(type,
+        raw=mapply(
+            function(conts, name) list(name=name, contents=conts),
+            images,
+            names(images),
+            SIMPLIFY=FALSE
+        ),
+
+        files=mapply(
+            function(f, size) list(name=f, contents=readBin(f, "raw", size)),
+            images,
+            file.size(images),
+            SIMPLIFY=FALSE
+        ),
+
+        urls=lapply(images, function(f) list(url=f))
+    )
+}
+
+
+image_type <- function(images)
+{
+    if(is.raw(images) || (is.list(images) && all(sapply(images, is.raw))))
+        return("raw")
+
+    if(all(file.exists(images) & !dir.exists(images)))
+        return("files")
+
+    if(all(sapply(images, is_any_uri)))
+        return("urls")
+
+    stop("All image inputs must be of the same type: filenames, URLs or raw vectors", call.=FALSE)
 }
 
 
