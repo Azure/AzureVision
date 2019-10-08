@@ -183,7 +183,7 @@ summary.customvision_model <- function(object, ...)
 #' @details
 #' Publishing a model makes it available to clients as a predictive service. Each iteration of the model can be published separately.
 #' @seealso
-#' [`train_model`], [`get_model`]
+#' [`train_model`], [`get_model`], [`customvision_predictive_service`], [`predict.classification_service`], [`predict.object_detection_service`]
 #' @rdname customvision_publish
 #' @export
 publish_model <- function(model, name, prediction_resource)

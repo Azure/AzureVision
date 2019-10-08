@@ -1,3 +1,22 @@
+#' Get predictions from a Custom Vision model
+#'
+#' @param object A Custom Vision object from which to get predictions. See 'Details' below.
+#' @param images The images for which to get predictions.
+#' @param type The type of prediction: either class membership (the default), the class probabilities, or a list containing all information returned by the prediction endpoint.
+#' @param save_result For the predictive service methods, whether to store the predictions on the server for future use.
+#' @param ... Further arguments passed to lower-level functions; not used.
+#' @details
+#' AzureVision defines prediction methods for both Custom Vision model training objects (of class `customvision_model`) and prediction services (`classification_service` and `object_detection_service`). The method for model training objects calls the "quick test" endpoint, and is meant only for testing purposes.
+#'
+#' The prediction endpoints accept a single image per request, so supplying multiple images to these functions will call the endpoints multiple times, in sequence. The images can be specified as:
+#' - A vector of local filenames. All common image file formats are supported.
+#' - A vector of publicly accessible URLs.
+#' - A raw vector, or a list of raw vectors, holding the binary contents of the image files.
+#' @seealso
+#' [`train_model`], [`publish_model`], [`classification_service`], [`object_detection_service`]
+#' @aliases predict
+#' @rdname customvision_predict
+#' @export
 predict.customvision_model <- function(object, images, type=c("class", "prob", "list"), ...)
 {
     type <- match.arg(type)
@@ -16,6 +35,8 @@ predict.customvision_model <- function(object, images, type=c("class", "prob", "
 }
 
 
+#' @rdname customvision_predict
+#' @export
 predict.classification_service <- function(object, images, type=c("class", "prob", "list"), save_result=FALSE, ...)
 {
     type <- match.arg(type)
@@ -23,6 +44,8 @@ predict.classification_service <- function(object, images, type=c("class", "prob
 }
 
 
+#' @rdname customvision_predict
+#' @export
 predict.object_detection_service <- function(object, images, type=c("class", "prob", "list"), save_result=FALSE, ...)
 {
     type <- match.arg(type)
@@ -48,6 +71,24 @@ customvision_predict_internal <- function(object, images, type, save_result, ver
 }
 
 
+#' Connect to a Custom Vision predictive service
+#'
+#' @param endpoint A prediction endpoint object, of class `customvision_prediction_endpoint`.
+#' @param project The project underlying this predictive service. Can be either an object of class `customvision_project`, or a string giving the ID of the project.
+#' @param name The published name of the service.
+#' @details
+#' These functions are handles to a predictive service that was previously published from a trained model. They have `predict` methods defined for them.
+#' @return
+#' An object of class `classification_service` or `object_detection_service`, as appropriate. These are subclasses of `customvision_predictive_service`.
+#' @seealso
+#' [`customvision_prediction_endpoint`], [`customvision_project`]
+#'
+#' [`predict.classification_service`], [`predict.object_detection_service`]
+#'
+#' [`train_model`], [`publish_model`]
+#' @aliases customvision_predictive_service
+#' @rdname customvision_predictive_service
+#' @export
 classification_service <- function(endpoint, project, name)
 {
     if(inherits(project, "classification_project"))
@@ -62,6 +103,8 @@ classification_service <- function(endpoint, project, name)
 }
 
 
+#' @rdname customvision_predictive_service
+#' @export
 object_detection_service <- function(endpoint, project, name)
 {
     if(inherits(project, "object_detection_project"))

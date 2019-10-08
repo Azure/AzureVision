@@ -25,5 +25,5 @@ Publish and unpublish a Custom Vision model iteration
 Publishing a model makes it available to clients as a predictive service. Each iteration of the model can be published separately.
 }
 \seealso{
-\code{\link{train_model}}, \code{\link{get_model}}
+\code{\link{train_model}}, \code{\link{get_model}}, \code{\link{customvision_predictive_service}}, \code{\link{predict.classification_service}}, \code{\link{predict.object_detection_service}}
 }
