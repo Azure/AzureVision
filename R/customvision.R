@@ -44,7 +44,8 @@ print.customvision_project <- function(x, ...)
 #' @param ... Further arguments passed to lower-level methods.
 #' @return
 #' `delete_customvision_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
-#'
+#' @seealso
+#' [`customvision_training_endpoint`]
 #' @aliases customvision_project
 #' @rdname customvision_project
 #' @export

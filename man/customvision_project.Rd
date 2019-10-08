@@ -59,3 +59,6 @@ delete_customvision_project(object, ...)
 \description{
 Create, retrieve, update and delete Azure Custom Vision projects
 }
+\seealso{
+\code{\link{customvision_training_endpoint}}
+}

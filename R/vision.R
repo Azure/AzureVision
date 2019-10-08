@@ -1,3 +1,16 @@
+#' Interface to Azure Computer Vision API
+#'
+#' @param endpoint A computer vision endpoint.
+#' @param image An image to be sent to the endpoint. This can be either a filename, a publicly accessible URL, or a raw vector holding the file contents.
+#' @param domain For `analyze`, which builtin model to use to analyze the image.
+#' @param options For `analyze`, a list of optional queries to obtain a broader analysis.
+#' @param language For `tag` and `read_text`, a 2-character code indicating the language to use. The default is `en`, for English.
+#' @param detect_orientation For `read_text`, whether to automatically determine the image's orientation.
+#' @param width,height For `make_thumbnail`, The dimensions for the returned thumbnail.
+#' @param smart_crop For `make_thumbnail`, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratio of the original image and the thumbnail don't match.
+#' @param outfile For `make_thumbnail`, an optional filename for the generated thumbnail. If not provided, the thumbnail is returned as a raw vector.
+#' @param ... Arguments passed to lower-level functions, and ultimately to `call_cognitive_endpoint`.
+#' @rdname computervision
 #' @export
 analyze <- function(endpoint, image, domain=NULL, options=list(), ...)
 {
@@ -12,6 +25,7 @@ analyze <- function(endpoint, image, domain=NULL, options=list(), ...)
 }
 
 
+#' @rdname computervision
 #' @export
 describe <- function(endpoint, image, ...)
 {
@@ -21,6 +35,7 @@ describe <- function(endpoint, image, ...)
 }
 
 
+#' @rdname computervision
 #' @export
 detect_objects <- function(endpoint, image, ...)
 {
@@ -30,6 +45,7 @@ detect_objects <- function(endpoint, image, ...)
 }
 
 
+#' @rdname computervision
 #' @export
 detect_faces <- function(endpoint, image, ...)
 {
@@ -40,6 +56,7 @@ detect_faces <- function(endpoint, image, ...)
 }
 
 
+#' @rdname computervision
 #' @export
 area_of_interest <- function(endpoint, image, ...)
 {
@@ -49,6 +66,7 @@ area_of_interest <- function(endpoint, image, ...)
 }
 
 
+#' @rdname computervision
 #' @export
 tag <- function(endpoint, image, language="en", ...)
 {
@@ -64,6 +82,7 @@ tag <- function(endpoint, image, language="en", ...)
 }
 
 
+#' @rdname computervision
 #' @export
 categorize <- function(endpoint, image, ...)
 {
@@ -75,6 +94,7 @@ categorize <- function(endpoint, image, ...)
 }
 
 
+#' @rdname computervision
 #' @export
 read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", ...)
 {
@@ -86,6 +106,7 @@ read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", .
 }
 
 
+#' @rdname computervision
 #' @export
 list_builtin_models <- function(endpoint)
 {
@@ -94,6 +115,7 @@ list_builtin_models <- function(endpoint)
 }
 
 
+#' @rdname computervision
 #' @export
 make_thumbnail <- function(endpoint, image, width, height, smart_crop=TRUE, ..., outfile=NULL)
 {
