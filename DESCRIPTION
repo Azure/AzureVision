@@ -5,7 +5,7 @@ Authors@R: c(
     person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
     person("Microsoft", role="cph")
     )
-Description: An interface to the Azure Computer Vision, Face Recognition, and Custom Vision client APIs.
+Description: An interface to the Azure Computer Vision and Custom Vision client APIs.
 URL: https://github.com/Azure/AzureVision https://github.com/Azure/AzureR
 BugReports: https://github.com/Azure/AzureVision/issues
 License: MIT + file LICENSE
@@ -17,10 +17,7 @@ Imports:
     httr,
     utils
 Suggests:
-    AzureAuth,
-    jpeg,
-    png,
-    svglite
+    AzureAuth
 Roxygen: list(markdown=TRUE)
 RoxygenNote: 6.1.1
 Remotes:

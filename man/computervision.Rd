@@ -2,6 +2,7 @@
 % Please edit documentation in R/vision.R
 \name{analyze}
 \alias{analyze}
+\alias{computervision}
 \alias{describe}
 \alias{detect_objects}
 \alias{detect_faces}
@@ -9,13 +10,14 @@
 \alias{tag}
 \alias{categorize}
 \alias{read_text}
-\alias{list_builtin_models}
+\alias{list_domains}
 \alias{make_thumbnail}
 \title{Interface to Azure Computer Vision API}
 \usage{
-analyze(endpoint, image, domain = NULL, options = list(), ...)
+analyze(endpoint, image, domain = NULL, feature_types = NULL,
+  language = "en", ...)
 
-describe(endpoint, image, ...)
+describe(endpoint, image, language = "en", ...)
 
 detect_objects(endpoint, image, ...)
 
@@ -30,7 +32,7 @@ categorize(endpoint, image, ...)
 read_text(endpoint, image, detect_orientation = TRUE, language = "en",
   ...)
 
-list_builtin_models(endpoint)
+list_domains(endpoint)
 
 make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
   outfile = NULL)
@@ -40,13 +42,13 @@ make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
 
 \item{image}{An image to be sent to the endpoint. This can be either a filename, a publicly accessible URL, or a raw vector holding the file contents.}
 
-\item{domain}{For \code{analyze}, which builtin model to use to analyze the image.}
+\item{domain}{For \code{analyze}, an optional domain-specific model to use to analyze the image. Can be "celebrities" or "landmarks".}
 
-\item{options}{For \code{analyze}, a list of optional queries to obtain a broader analysis.}
+\item{feature_types}{For \code{analyze}, an optional character vector of more detailed features to return. This can be one or more of: "categories", "tags", "description", "faces", "imagetype", "color", "adult", "brands" and "objects".}
+
+\item{language}{A 2-character code indicating the language to use for tags, feature labels and descriptions. The default is \code{en}, for English.}
 
 \item{...}{Arguments passed to lower-level functions, and ultimately to \code{call_cognitive_endpoint}.}
-
-\item{language}{For \code{tag} and \code{read_text}, a 2-character code indicating the language to use. The default is \code{en}, for English.}
 
 \item{detect_orientation}{For \code{read_text}, whether to automatically determine the image's orientation.}
 
@@ -56,6 +58,33 @@ make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
 
 \item{outfile}{For \code{make_thumbnail}, an optional filename for the generated thumbnail. If not provided, the thumbnail is returned as a raw vector.}
 }
+\value{
+\code{make_thumbnail} returns a raw vector holding the contents of the thumbnail, if the \code{outfile} argument is NULL. \code{categorize} returns a data frame. The others return an object of class \code{computervision_response}, which is a simple wrapper class for the response from the API endpoint.
+}
 \description{
 Interface to Azure Computer Vision API
+}
+\details{
+\code{analyze} extracts visual features from the image. To obtain more detailed features, specify the \code{domain} and/or \code{feature_types} arguments as appropriate.
+
+\code{describe} returns a short text description of the image.
+
+\code{detect_objects} detects objects in the image. It returns a list of bounding boxes indicating the locations of the detected objects.
+
+\code{detect_faces} detects the presence or absence of a human face in the image.
+
+\code{area_of_interest} attempts to find the "interesting" part of an image, meaning the most likely location of the image's subject.
+
+\code{tag} returns a set of words that are relevant to the content of the image. Not to be confused with the \code{\link{add_tags}} or \code{\link{tag_uploaded_images}} functions that are part of the Custom Vision API.
+
+\code{categorize} attempts to place the image into a list of predefined categories.
+
+\code{read_text} performs optical character recognition (OCR) on the image.
+
+\code{list_domains} returns the predefined domain-specific models that can be queried by \code{analyze} for deeper analysis.
+
+\code{make_thumbnail} generates a thumbnail of the image, with the specified dimensions.
+}
+\seealso{
+\code{\link{computervision_endpoint}}, \code{\link[AzureCognitive:call_cognitive_endpoint]{AzureCognitive::call_cognitive_endpoint}}
 }

@@ -23,6 +23,9 @@ An object inheriting from \code{cognitive_endpoint}. The subclass indicates the 
 \description{
 Endpoint objects for computer vision services
 }
+\details{
+These are functions to create service-specific endpoint objects. They handle differences between the services in how they perform authentication, endpoint paths, and so on.
+}
 \seealso{
 \code{\link{cognitive_endpoint}}, \code{\link{call_cognitive_endpoint}}
 }

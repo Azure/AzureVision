@@ -2,6 +2,8 @@
 #'
 #' @param url The URL of the endpoint.
 #' @param ... Other arguments to pass to [`AzureCognitive::cognitive_endpoint`].
+#' @details
+#' These are functions to create service-specific endpoint objects. They handle differences between the services in how they perform authentication, endpoint paths, and so on.
 #' @return
 #' An object inheriting from `cognitive_endpoint`. The subclass indicates the type of service/endpoint: Computer Vision, Custom Vision training, or Custom Vision prediction.
 #' @seealso
