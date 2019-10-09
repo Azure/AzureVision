@@ -32,7 +32,7 @@
 #'
 #' [`add_tags`], [`list_tags`], [`remove_tags`]
 #'
-#' [`create_customvision_project`], [`get_customvision_project`], [`delete_customvision_project`]
+#' [`customvision_project`]
 #' @rdname customvision_image
 #' @export
 add_images <- function(project, images, tags=NULL, regions=NULL)

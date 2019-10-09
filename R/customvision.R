@@ -36,7 +36,6 @@ print.customvision_project <- function(x, ...)
 #' @param endpoint A custom vision endpoint.
 #' @param object For `delete_customvision_project`, either an endpoint, or a project object.
 #' @param name,id The name and ID of the project. At least one of these must be specified for `get_project`, `update_project` and `delete_project`. The name is required for `create_project` (the ID will be assigned automatically).
-#' @param purpose For `create_project`, what the model will be used for: either to classify objects in an image, or to detect whether an object is present in an image. Note that this setting cannot be changed once the project is created.
 #' @param domain What kinds of images the model is meant to apply to. The default "general" means the model is suitable for use in a generic setting. Other, more specialised domains for classification include "food", "landmarks" and "retail"; for object detection the other possible domain is "logo".
 #' @param export_target What formats are supported when exporting the model.
 #' @param multiple_tags For classification models, Whether multiple categories (tags/labels) for an image are allowed. The default is `FALSE`, meaning an image represents one and only one category. Ignored for object detection models.

@@ -43,8 +43,6 @@ delete_project(object, ...)
 \item{object}{For \code{delete_customvision_project}, either an endpoint, or a project object.}
 
 \item{...}{Further arguments passed to lower-level methods.}
-
-\item{purpose}{For \code{create_project}, what the model will be used for: either to classify objects in an image, or to detect whether an object is present in an image. Note that this setting cannot be changed once the project is created.}
 }
 \value{
 \code{delete_project} returns NULL invisibly, on a successful deletion. The others return an object of class \code{customvision_project}.

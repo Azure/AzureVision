@@ -62,5 +62,5 @@ Note that once uploaded, images are identified only by their ID; there is no gen
 
 \code{\link{add_tags}}, \code{\link{list_tags}}, \code{\link{remove_tags}}
 
-\code{\link{create_customvision_project}}, \code{\link{get_customvision_project}}, \code{\link{delete_customvision_project}}
+\code{\link{customvision_project}}
 }
