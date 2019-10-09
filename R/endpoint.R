@@ -20,7 +20,7 @@ computervision_endpoint <- function(url, ...)
 #' @export
 customvision_training_endpoint <- function(url, ...)
 {
-    cognitive_endpoint(url, service_type="CustomVision.Training", ...)
+    cognitive_endpoint(url, service_type="CustomVision.Training", ..., auth_header="training-key")
 }
 
 
@@ -28,7 +28,7 @@ customvision_training_endpoint <- function(url, ...)
 #' @export
 customvision_prediction_endpoint <- function(url, ...)
 {
-    cognitive_endpoint(url, service_type="CustomVision.Prediction", ...)
+    cognitive_endpoint(url, service_type="CustomVision.Prediction", ..., auth_header="prediction-key")
 }
 
 
@@ -54,16 +54,16 @@ call_cognitive_endpoint.computervision_endpoint <- function(endpoint, ...)
 
 
 #' @export
-call_cognitive_endpoint.customvision_training_endpoint <- function(endpoint, ..., auth_header="training-key")
+call_cognitive_endpoint.customvision_training_endpoint <- function(endpoint, ...)
 {
-    NextMethod(auth_header=auth_header)
+    NextMethod()
 }
 
 
 #' @export
-call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, ..., auth_header="prediction-key")
+call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, ...)
 {
-    NextMethod(auth_header=auth_header)
+    NextMethod()
 }
 
 

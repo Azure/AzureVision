@@ -6,8 +6,8 @@
 #' @param feature_types For `analyze`, an optional character vector of more detailed features to return. This can be one or more of: "categories", "tags", "description", "faces", "imagetype", "color", "adult", "brands" and "objects".
 #' @param language A 2-character code indicating the language to use for tags, feature labels and descriptions. The default is `en`, for English.
 #' @param detect_orientation For `read_text`, whether to automatically determine the image's orientation.
-#' @param width,height For `make_thumbnail`, The dimensions for the returned thumbnail.
-#' @param smart_crop For `make_thumbnail`, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratio of the original image and the thumbnail don't match.
+#' @param width,height For `make_thumbnail`, the dimensions for the returned thumbnail.
+#' @param smart_crop For `make_thumbnail`, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratios of the original image and the thumbnail don't match.
 #' @param outfile For `make_thumbnail`, an optional filename for the generated thumbnail. If not provided, the thumbnail is returned as a raw vector.
 #' @param ... Arguments passed to lower-level functions, and ultimately to `call_cognitive_endpoint`.
 #' @details
@@ -31,7 +31,7 @@
 #'
 #' `make_thumbnail` generates a thumbnail of the image, with the specified dimensions.
 #' @return
-#' `make_thumbnail` returns a raw vector holding the contents of the thumbnail, if the `outfile` argument is NULL. `categorize` returns a data frame. The others return an object of class `computervision_response`, which is a simple wrapper class for the response from the API endpoint.
+#' `make_thumbnail` returns a raw vector holding the contents of the thumbnail, if the `outfile` argument is NULL. `tag` and `categorize` return a data frame. The others return an object of class `computervision_response`, which is a simple wrapper class for the response from the API endpoint to allow pretty-printing.
 #' @seealso
 #' [`computervision_endpoint`], [`AzureCognitive::call_cognitive_endpoint`]
 #'
@@ -56,7 +56,8 @@ analyze <- function(endpoint, image, domain=NULL, feature_types=NULL, language="
 describe <- function(endpoint, image, language="en", ...)
 {
     body <- image_to_body(image)
-    res <- call_cognitive_endpoint(endpoint, "describe", body=body, ..., http_verb="POST")
+    options <- list(language=language)
+    res <- call_cognitive_endpoint(endpoint, "describe", body=body, options=options, ..., http_verb="POST")
     as_vision_response(res)
 }
 
@@ -160,7 +161,7 @@ image_to_body <- function(image)
     if(is.raw(image))
         image
     else if(file.exists(image))
-        readBin(image, "raw", file.info(image)$size)
+        readBin(image, "raw", file.size(image))
     else if(is_any_uri(image))
         list(url=image)
     else stop("Could not find image", call.=FALSE)

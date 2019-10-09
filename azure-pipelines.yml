@@ -15,9 +15,9 @@ steps:
   displayName: 'Copy to Cloudyr'
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
-- bash: |
-    sudo apt-get -y install libjpeg-dev libpng-dev
-  displayName: 'Install libjpeg'
+# - bash: |
+#     sudo apt-get -y install libjpeg-dev libpng-dev
+#   displayName: 'Install libjpeg'
 
 - bash: |
     echo "options(repos = '$(cranRepo)')" > ~/.Rprofile
