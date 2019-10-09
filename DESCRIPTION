@@ -17,7 +17,8 @@ Imports:
     httr,
     utils
 Suggests:
-    AzureAuth
+    AzureAuth,
+    testthat
 Roxygen: list(markdown=TRUE)
 RoxygenNote: 6.1.1
 Remotes:
