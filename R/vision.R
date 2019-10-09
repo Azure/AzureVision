@@ -135,9 +135,9 @@ read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", .
 
 #' @rdname computervision
 #' @export
-list_domains <- function(endpoint)
+list_domains <- function(endpoint, ...)
 {
-    res <- call_cognitive_endpoint(endpoint, "models")
+    res <- call_cognitive_endpoint(endpoint, "models", ...)
     as_vision_response(res)
 }
 

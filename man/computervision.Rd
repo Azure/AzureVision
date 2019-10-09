@@ -32,7 +32,7 @@ categorize(endpoint, image, ...)
 read_text(endpoint, image, detect_orientation = TRUE, language = "en",
   ...)
 
-list_domains(endpoint)
+list_domains(endpoint, ...)
 
 make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
   outfile = NULL)
@@ -52,14 +52,14 @@ make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
 
 \item{detect_orientation}{For \code{read_text}, whether to automatically determine the image's orientation.}
 
-\item{width, height}{For \code{make_thumbnail}, The dimensions for the returned thumbnail.}
+\item{width, height}{For \code{make_thumbnail}, the dimensions for the returned thumbnail.}
 
-\item{smart_crop}{For \code{make_thumbnail}, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratio of the original image and the thumbnail don't match.}
+\item{smart_crop}{For \code{make_thumbnail}, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratios of the original image and the thumbnail don't match.}
 
 \item{outfile}{For \code{make_thumbnail}, an optional filename for the generated thumbnail. If not provided, the thumbnail is returned as a raw vector.}
 }
 \value{
-\code{make_thumbnail} returns a raw vector holding the contents of the thumbnail, if the \code{outfile} argument is NULL. \code{categorize} returns a data frame. The others return an object of class \code{computervision_response}, which is a simple wrapper class for the response from the API endpoint.
+\code{make_thumbnail} returns a raw vector holding the contents of the thumbnail, if the \code{outfile} argument is NULL. \code{tag} and \code{categorize} return a data frame. The others return an object of class \code{computervision_response}, which is a simple wrapper class for the response from the API endpoint to allow pretty-printing.
 }
 \description{
 Interface to Azure Computer Vision API
@@ -81,10 +81,12 @@ Interface to Azure Computer Vision API
 
 \code{read_text} performs optical character recognition (OCR) on the image.
 
-\code{list_domains} returns the predefined domain-specific models that can be queried by \code{analyze} for deeper analysis.
+\code{list_domains} returns the predefined domain-specific models that can be queried by \code{analyze} for deeper analysis. Not to be confused with the domains available for training models with the Custom Vision API.
 
 \code{make_thumbnail} generates a thumbnail of the image, with the specified dimensions.
 }
 \seealso{
 \code{\link{computervision_endpoint}}, \code{\link[AzureCognitive:call_cognitive_endpoint]{AzureCognitive::call_cognitive_endpoint}}
+
+\href{https://docs.microsoft.com/en-us/azure/cognitive-services/Computer-vision/Home}{Computer Vision documentation}
 }
