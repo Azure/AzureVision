@@ -35,15 +35,15 @@ print.customvision_project <- function(x, ...)
 #'
 #' @param endpoint A custom vision endpoint.
 #' @param object For `delete_customvision_project`, either an endpoint, or a project object.
-#' @param name,id The name and ID of the project. At least one of these must be specified for `get_customvision_project`, `update_customvision_project` and `delete_customvision_project`. The name is required for `create_customvision_project` (the ID will be assigned automatically).
-#' @param purpose For `create_customvision_project`, what the model will be used for: either to classify objects in an image, or to detect whether an object is present in an image. Note that this setting cannot be changed once the project is created.
+#' @param name,id The name and ID of the project. At least one of these must be specified for `get_project`, `update_project` and `delete_project`. The name is required for `create_project` (the ID will be assigned automatically).
+#' @param purpose For `create_project`, what the model will be used for: either to classify objects in an image, or to detect whether an object is present in an image. Note that this setting cannot be changed once the project is created.
 #' @param domain What kinds of images the model is meant to apply to. The default "general" means the model is suitable for use in a generic setting. Other, more specialised domains for classification include "food", "landmarks" and "retail"; for object detection the other possible domain is "logo".
 #' @param export_target What formats are supported when exporting the model.
 #' @param multiple_tags For classification models, Whether multiple categories (tags/labels) for an image are allowed. The default is `FALSE`, meaning an image represents one and only one category. Ignored for object detection models.
 #' @param description An optional text description of the project.
 #' @param ... Further arguments passed to lower-level methods.
 #' @return
-#' `delete_customvision_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
+#' `delete_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
 #' @seealso
 #' [`customvision_training_endpoint`]
 #' @aliases customvision_project
@@ -56,7 +56,7 @@ create_classification_project <- function(endpoint, name,
                                           description=NULL)
 {
     export_target <- match.arg(export_target)
-    create_customvision_project(endpoint, name, domain, export_target, multiple_tags, description,
+    create_project(endpoint, name, domain, export_target, multiple_tags, description,
                                 purpose="classification")
 }
 
@@ -66,23 +66,20 @@ create_classification_project <- function(endpoint, name,
 create_object_detection_project <- function(endpoint, name,
                                             domain="general",
                                             export_target=c("none", "basic", "VAIDK"),
-                                            multiple_tags=FALSE,
                                             description=NULL)
 {
     export_target <- match.arg(export_target)
-    create_customvision_project(endpoint, name, domain, export_target, multiple_tags, description,
+    create_project(endpoint, name, domain, export_target, multiple_tags=FALSE, description,
                                 purpose="object_detection")
 }
 
 
-#' @rdname customvision_project
-#' @export
-create_customvision_project <- function(endpoint, name,
-                                        domain="general",
-                                        export_target=c("none", "basic", "VAIDK"),
-                                        multiple_tags=FALSE,
-                                        description=NULL,
-                                        purpose=c("classification", "object_detection"))
+create_project <- function(endpoint, name,
+                           domain="general",
+                           export_target=c("none", "basic", "VAIDK"),
+                           multiple_tags=FALSE,
+                           description=NULL,
+                           purpose=c("classification", "object_detection"))
 {
     purpose <- match.arg(purpose)
     export_target <- match.arg(export_target)
@@ -103,7 +100,7 @@ create_customvision_project <- function(endpoint, name,
 
     # if export target is Vision AI Dev Kit, must do a separate update
     if(export_target == "VAIDK")
-        return(update_customvision_project(endpoint, id=obj$id, export_target="VAIDK"))
+        return(update_project(endpoint, id=obj$id, export_target="VAIDK"))
 
     make_customvision_project(obj, endpoint)
 }
@@ -111,7 +108,7 @@ create_customvision_project <- function(endpoint, name,
 
 #' @rdname customvision_project
 #' @export
-list_customvision_projects <- function(endpoint)
+list_projects <- function(endpoint)
 {
     lst <- call_cognitive_endpoint(endpoint, "training/projects")
     lapply(lst, make_customvision_project, endpoint=endpoint)
@@ -120,7 +117,7 @@ list_customvision_projects <- function(endpoint)
 
 #' @rdname customvision_project
 #' @export
-get_customvision_project <- function(endpoint, name=NULL, id=NULL)
+get_project <- function(endpoint, name=NULL, id=NULL)
 {
     if(is.null(id))
         id <- get_project_id_by_name(endpoint, name)
@@ -132,16 +129,16 @@ get_customvision_project <- function(endpoint, name=NULL, id=NULL)
 
 #' @rdname customvision_project
 #' @export
-update_customvision_project <- function(endpoint, name=NULL, id=NULL,
-                                        domain="general",
-                                        export_target=c("none", "basic", "VAIDK"),
-                                        multiple_tags=FALSE,
-                                        description=NULL)
+update_project <- function(endpoint, name=NULL, id=NULL,
+                           domain="general",
+                           export_target=c("none", "basic", "VAIDK"),
+                           multiple_tags=FALSE,
+                           description=NULL)
 {
     if(is.null(id))
         id <- get_project_id_by_name(endpoint, name)
 
-    project <- get_customvision_project(endpoint, id=id)
+    project <- get_project(endpoint, id=id)
     newbody <- list()
 
     if(!is.null(name) && name != project$name)
@@ -183,14 +180,14 @@ update_customvision_project <- function(endpoint, name=NULL, id=NULL,
 
 #' @rdname customvision_project
 #' @export
-delete_customvision_project <- function(object, ...)
+delete_project <- function(object, ...)
 {
-    UseMethod("delete_customvision_project")
+    UseMethod("delete_project")
 }
 
 
 #' @export
-delete_customvision_project.customvision_training_endpoint <- function(object, name=NULL, id=NULL, confirm=TRUE, ...)
+delete_project.customvision_training_endpoint <- function(object, name=NULL, id=NULL, confirm=TRUE, ...)
 {
     if(is.null(id))
         id <- get_project_id_by_name(object, name)
@@ -205,7 +202,7 @@ delete_customvision_project.customvision_training_endpoint <- function(object, n
 
 
 #' @export
-delete_customvision_project.customvision_project <- function(object, confirm=TRUE, ...)
+delete_project.customvision_project <- function(object, confirm=TRUE, ...)
 {
     name <- object$project$name
     id <- object$project$id
@@ -285,7 +282,7 @@ get_project_id_by_name <- function(endpoint, name=NULL)
     if(is.null(name))
         stop("Either name or ID must be supplied", call.=FALSE)
 
-    lst <- list_customvision_projects(endpoint)
+    lst <- list_projects(endpoint)
     i <- which(sapply(lst, function(obj) obj$project$name == name))
     if(is_empty(i))
         stop(sprintf("Project '%s' not found", name), call.=FALSE)
