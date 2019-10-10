@@ -174,14 +174,25 @@ summary.customvision_model <- function(object, ...)
 }
 
 
-#' Publish and unpublish a Custom Vision model iteration
+#' Publish, export and unpublish a Custom Vision model iteration
 #'
 #' @param model A Custom Vision model iteration object.
-#' @param name The name to assign to the published model.
-#' @param prediction_resource The Azure prediction resource to publish to. This can either be a string containing the resource ID, or an AzureRMR resource object.
+#' @param name For `publish_model`, the name to assign to the published model on the prediction endpoint.
+#' @param prediction_resource For `publish_model`, the Custom Vision prediction resource to publish to. This can either be a string containing the Azure resource ID, or an AzureRMR resource object.
+#' @param format For `export_model`, the format to export to. See below for supported formats.
+#' @param download For `export_model`, whether to download the exported model.
 #' @param confirm For `unpublish_model`, whether to ask for confirmation first.
 #' @details
-#' Publishing a model makes it available to clients as a predictive service. Each iteration of the model can be published separately.
+#' Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format, which can then be downloaded. Each iteration of the model can be published or exported separately.
+#'
+#' The `format` argument to `export_model` can be one of the following. Note that exporting a model requires that the project was created with support for it.
+#' - "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
+#' - "coreml": CoreML, for iOS 11 devices
+#' - "tensorflow": TensorFlow, for Android devices
+#' - "linux docker", "windows docker", "arm docker": A Docker image for the given OS
+#' - "vaidk": Vision AI Development Kit
+#' @return
+#' `export_model` returns the source URL of the downloaded file, invisibly if `download=TRUE`.
 #' @seealso
 #' [`train_model`], [`get_model`], [`customvision_predictive_service`], [`predict.classification_service`], [`predict.object_detection_service`]
 #' @rdname customvision_publish
@@ -210,6 +221,42 @@ unpublish_model <- function(model, confirm=TRUE)
 }
 
 
+#' @rdname customvision_publish
+#' @export
+export_model <- function(model, format, download=TRUE)
+{
+    settings <- model$project$project$settings
+
+    if(!is_compact_domain(settings$domainId))
+        stop("Project was not created with support for exporting", call.=FALSE)
+
+    platform <- get_export_platform(format)
+    if(platform$platform == "VAIDK" && is_empty(settings$targetExportPlatforms))
+        stop("Project does not support exporting to Vision AI Dev Kit format", call.=FALSE)
+
+    op <- file.path("iterations", model$id, "export")
+    for(i in 1:500)
+    {
+        res <- do_training_op(model$project, op, options=platform, http_verb="POST")
+        status <- res$status
+        if(res$status %in% c("Done", "Failed"))
+            break
+        Sys.sleep(10)
+    }
+    if(res$status != "Done")
+        stop("Error exporting model", call.=FALSE)
+
+    if(download)
+    {
+        target <- basename(httr::parse_url(res$downloadUri)$path)
+        message("Downloading to ", target)
+        utils::download.file(res$downloadUri, target)
+        invisible(res$downloadUri)
+    }
+    else res$downloadUri
+}
+
+
 as_datetime <- function(x, format="%Y-%m-%dT%H:%M:%S", tz="UTC")
 {
     as.POSIXct(x, format=format, tz=tz)
@@ -223,3 +270,20 @@ make_model_iteration <- function(iteration, project)
         class="customvision_model"
     )
 }
+
+
+get_export_platform <- function(format)
+{
+    switch(tolower(format),
+        "coreml"=list(platform="CoreML"),
+        "arm docker"=list(platform="DockerFile", flavor="ARM"),
+        "linux docker"=list(platform="DockerFile", flavor="Linux"),
+        "windows docker"=list(platform="DockerFile", flavor="Windows"),
+        "onnx 1.0"=list(platform="ONNX", flavor="ONNX10"),
+        "onnx 1.2"=list(platform="ONNX", flavor="ONNX12"),
+        "tensorflow"=list(platform="TensorFlow"),
+        "vaidk"=list(platform="VAIDK"),
+        stop("Unrecognised export format '", format, "'", call.=FALSE)
+    )
+}
+
