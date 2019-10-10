@@ -1,4 +1,4 @@
-context("Custom Vision training")
+context("Custom Vision project and image creation")
 
 custvis_url <- Sys.getenv("AZ_TEST_CUSTOMVISION_URL")
 custvis_key <- Sys.getenv("AZ_TEST_CUSTOMVISION_KEY")
@@ -9,20 +9,29 @@ if(custvis_url == "" || custvis_key == "" || storage == "" || custvis_sas == "")
     skip("Tests skipped: resource details not set")
 
 projname <- paste0(sample(letters, 10, TRUE), collapse="")
-cans <- paste0(storage, "customvision/", 1:5, ".jpg", custvis_sas)
-cartons <- paste0(storage, "customvision/", 33:37, ".jpg", custvis_sas)
-tags <- rep(c("cans", "cartons"), each=5)
 
-endp <- customvision_training_endpoint(custvis_url, key=custvis_key)
 
-test_that("Custom Vision training endpoint works",
+test_that("Custom Vision project creation works",
 {
+    endp <- customvision_training_endpoint(custvis_url, key=custvis_key)
     expect_is(endp, c("customvision_training_endpoint", "cognitive_endpoint"))
 
     expect_true(is_empty(list_projects(endp)))
 
     proj <- create_classification_project(endp, projname)
     expect_is(proj, "classification_project")
+
+    expect_true(!is_empty(list_projects(endp)))
+})
+
+test_that("Adding and tagging images works",
+{
+    endp <- customvision_training_endpoint(custvis_url, key=custvis_key)
+    proj <- get_project(endp, projname)
+
+    cans <- paste0(storage, "customvision/", 1:5, ".jpg", custvis_sas)
+    cartons <- paste0(storage, "customvision/", 33:37, ".jpg", custvis_sas)
+    tags <- rep(c("can", "carton"), each=5)
 
     img_ids <- add_images(proj, c(cans, cartons), tags)
     expect_type(img_ids, "character")
@@ -34,15 +43,26 @@ test_that("Custom Vision training endpoint works",
     img_tags <- do.call(rbind.data.frame, img_df$tags)$tagName
     expect_identical(img_tags, tags)
 
-    mod <- train_model(proj)
-    expect_is(mod, "customvision_model")
+    img_loc <- add_images(proj, paste0("../resources/", c("can1.jpg", "carton1.jpg")))
+    expect_type(img_loc, "character")
 
-    show <- show_model(mod)
-    expect_type(show, "list")
+    untagged_ids <- list_images(proj, "untagged")
+    expect_type(untagged_ids, "character")
+    expect_identical(sort(untagged_ids), sort(img_loc))
 
-    perf <- show_training_performance(mod)
-    expect_type(perf, "list")
+    tagged_ids <- tag_uploaded_images(proj, list(c("can", "object"), c("carton", "object")), img_loc)
+    expect_identical(tagged_ids, img_loc)
+
+    tags <- list_tags(proj)
+    expect_identical(sort(tags), c("can", "carton", "object"))
+
+    tagdf <- add_negative_tag(proj, "negtag")
+    expect_true("negtag" %in% tagdf$name)
+
+    tags <- list_tags(proj)
+    expect_true("negtag" %in% tags)
 })
 
 
+endp <- customvision_training_endpoint(custvis_url, key=custvis_key)
 delete_project(endp, projname, confirm=FALSE)
