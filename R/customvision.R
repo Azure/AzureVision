@@ -41,16 +41,26 @@ print.customvision_project <- function(x, ...)
 #' @param multiple_tags For classification models, Whether multiple categories (tags/labels) for an image are allowed. The default is `FALSE`, meaning an image represents one and only one category. Ignored for object detection models.
 #' @param description An optional text description of the project.
 #' @param ... Further arguments passed to lower-level methods.
+#' @details
+#' A Custom Vision project contains the metadata for a model: its intended purpose (classification vs object detection), the domain, the set of training images, and so on. Once you have created a project, you upload images to it, and train models based on those images. A trained model can then be published as a predictive service, or exported for standalone use.
+#'
+#' By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting `export_target="basic"` enables exporting to the following formats:
+#' - "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
+#' - "coreml": CoreML, for iOS 11 devices
+#' - "tensorflow": TensorFlow
+#' - "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
+#'
+#' Setting `export_target="vaidk"` allows exporting to Vision AI Development Kit format, in addition to the above.
 #' @return
 #' `delete_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
 #' @seealso
-#' [`customvision_training_endpoint`]
+#' [`customvision_training_endpoint`], [`add_images`], [`train_model`], [`publish_model`], [`predict.customvision_model`]
 #' @aliases customvision_project
 #' @rdname customvision_project
 #' @export
 create_classification_project <- function(endpoint, name,
                                           domain="general",
-                                          export_target=c("none", "basic", "VAIDK"),
+                                          export_target=c("none", "basic", "vaidk"),
                                           multiple_tags=FALSE,
                                           description=NULL)
 {
@@ -64,7 +74,7 @@ create_classification_project <- function(endpoint, name,
 #' @export
 create_object_detection_project <- function(endpoint, name,
                                             domain="general",
-                                            export_target=c("none", "basic", "VAIDK"),
+                                            export_target=c("none", "basic", "vaidk"),
                                             description=NULL)
 {
     export_target <- match.arg(export_target)
@@ -75,7 +85,7 @@ create_object_detection_project <- function(endpoint, name,
 
 create_project <- function(endpoint, name,
                            domain="general",
-                           export_target=c("none", "basic", "VAIDK"),
+                           export_target=c("none", "basic", "vaidk"),
                            multiple_tags=FALSE,
                            description=NULL,
                            purpose=c("classification", "object_detection"))
@@ -98,7 +108,7 @@ create_project <- function(endpoint, name,
     obj <- call_cognitive_endpoint(endpoint, "training/projects", options=opts, http_verb="POST")
 
     # if export target is Vision AI Dev Kit, must do a separate update
-    if(export_target == "VAIDK")
+    if(export_target == "vaidk")
         return(update_project(endpoint, id=obj$id, export_target="VAIDK"))
 
     make_customvision_project(obj, endpoint)
@@ -130,7 +140,7 @@ get_project <- function(endpoint, name=NULL, id=NULL)
 #' @export
 update_project <- function(endpoint, name=NULL, id=NULL,
                            domain="general",
-                           export_target=c("none", "basic", "VAIDK"),
+                           export_target=c("none", "basic", "vaidk"),
                            multiple_tags=FALSE,
                            description=NULL)
 {
@@ -158,7 +168,7 @@ update_project <- function(endpoint, name=NULL, id=NULL,
         "none"
     else if(is_empty(project$settings$targetExportPlatforms))
         "basic"
-    else "VAIDK"
+    else "vaidk"
 
     if(newtarget || newdomain)
     {
@@ -169,7 +179,7 @@ update_project <- function(endpoint, name=NULL, id=NULL,
     if(newclasstype)
         newbody$settings$classificationType <- if(multiple_tags) "Multilabel" else "Multiclass"
 
-    if(export_target == "VAIDK")
+    if(export_target == "vaidk")
         newbody$settings$targetExportPlatforms <- I("VAIDK")
 
     obj <- call_cognitive_endpoint(endpoint, file.path("training/projects", id), body=newbody, http_verb="PATCH")

@@ -26,20 +26,20 @@ export_model(model, format, download = TRUE)
 \item{download}{For \code{export_model}, whether to download the exported model.}
 }
 \value{
-\code{export_model} returns the source URL of the downloaded file, invisibly if \code{download=TRUE}.
+\code{export_model} returns the URL of the exported file, invisibly if \code{download=TRUE}.
 }
 \description{
 Publish, export and unpublish a Custom Vision model iteration
 }
 \details{
-Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format, which can then be downloaded. Each iteration of the model can be published or exported separately.
+Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format in Azure storage, which can then be downloaded. Each iteration of the model can be published or exported separately.
 
 The \code{format} argument to \code{export_model} can be one of the following. Note that exporting a model requires that the project was created with support for it.
 \itemize{
 \item "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
 \item "coreml": CoreML, for iOS 11 devices
-\item "tensorflow": TensorFlow, for Android devices
-\item "linux docker", "windows docker", "arm docker": A Docker image for the given OS
+\item "tensorflow": TensorFlow
+\item "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
 \item "vaidk": Vision AI Development Kit
 }
 }

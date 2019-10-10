@@ -56,7 +56,7 @@ For \code{list_models}, based on the \code{as} argument: \code{as="ids"} returns
 Create, retrieve and delete a model iteration
 }
 \details{
-Training a Custom Vision model results in a \emph{model iteration}. This is a computer vision model that has been trained on the current set of images uploaded to the endpoint. Successive model iterations trained on different image sets do not overwrite previous ones.
+Training a Custom Vision model results in a \emph{model iteration}. Each iteration is based on the current set of images uploaded to the endpoint. Successive model iterations trained on different image sets do not overwrite previous ones.
 
 By default, AzureVision will use the latest model iteration for actions such as prediction, showing performance statistics, and so on. You can list the model iterations with \code{list_models}, and retrieve a specific iteration by passing the iteration ID to \code{get_model}.
 }

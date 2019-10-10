@@ -21,7 +21,7 @@ print.customvision_model <- function(x, ...)
 #' @param confirm For the `delete_model` methods, whether to ask for confirmation first.
 #' @param ... Arguments passed to lower-level functions.
 #' @details
-#' Training a Custom Vision model results in a _model iteration_. This is a computer vision model that has been trained on the current set of images uploaded to the endpoint. Successive model iterations trained on different image sets do not overwrite previous ones.
+#' Training a Custom Vision model results in a _model iteration_. Each iteration is based on the current set of images uploaded to the endpoint. Successive model iterations trained on different image sets do not overwrite previous ones.
 #'
 #' By default, AzureVision will use the latest model iteration for actions such as prediction, showing performance statistics, and so on. You can list the model iterations with `list_models`, and retrieve a specific iteration by passing the iteration ID to `get_model`.
 #' @return
@@ -183,16 +183,16 @@ summary.customvision_model <- function(object, ...)
 #' @param download For `export_model`, whether to download the exported model.
 #' @param confirm For `unpublish_model`, whether to ask for confirmation first.
 #' @details
-#' Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format, which can then be downloaded. Each iteration of the model can be published or exported separately.
+#' Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format in Azure storage, which can then be downloaded. Each iteration of the model can be published or exported separately.
 #'
 #' The `format` argument to `export_model` can be one of the following. Note that exporting a model requires that the project was created with support for it.
 #' - "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
 #' - "coreml": CoreML, for iOS 11 devices
-#' - "tensorflow": TensorFlow, for Android devices
-#' - "linux docker", "windows docker", "arm docker": A Docker image for the given OS
+#' - "tensorflow": TensorFlow
+#' - "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
 #' - "vaidk": Vision AI Development Kit
 #' @return
-#' `export_model` returns the source URL of the downloaded file, invisibly if `download=TRUE`.
+#' `export_model` returns the URL of the exported file, invisibly if `download=TRUE`.
 #' @seealso
 #' [`train_model`], [`get_model`], [`customvision_predictive_service`], [`predict.classification_service`], [`predict.object_detection_service`]
 #' @rdname customvision_publish
