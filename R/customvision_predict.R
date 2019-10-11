@@ -83,7 +83,7 @@ customvision_predict_internal <- function(object, images, type, save_result, ver
 #' @seealso
 #' [`customvision_prediction_endpoint`], [`customvision_project`]
 #'
-#' [`predict.classification_service`], [`predict.object_detection_service`]
+#' [`predict.classification_service`], [`predict.object_detection_service`], [`do_prediction_op`]
 #'
 #' [`train_model`], [`publish_model`]
 #' @aliases customvision_predictive_service

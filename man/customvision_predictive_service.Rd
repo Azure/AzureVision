@@ -29,7 +29,7 @@ These functions are handles to a predictive service that was previously publishe
 \seealso{
 \code{\link{customvision_prediction_endpoint}}, \code{\link{customvision_project}}
 
-\code{\link{predict.classification_service}}, \code{\link{predict.object_detection_service}}
+\code{\link{predict.classification_service}}, \code{\link{predict.object_detection_service}}, \code{\link{do_prediction_op}}
 
 \code{\link{train_model}}, \code{\link{publish_model}}
 }

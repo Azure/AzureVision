@@ -32,56 +32,47 @@ customvision_prediction_endpoint <- function(url, ...)
 }
 
 
-# #' @export
-# face_endpoint <- function(url, ...)
-# {
-#     cognitive_endpoint(url, service_type="Face", ...)
-# }
-
-
+#' Carry out a Custom Vision operation
+#'
+#' @param project For `do_training_op`, a Custom Vision project.
+#' @param service For `do_prediction_op`, a Custom Vision predictive service.
+#' @param op,... Further arguments passed to `call_cognitive_endpoint`, and ultimately to the REST API.
+#' @details
+#' These functions provide low-level access to the Custom Vision REST API. `do_training_op` is for working with the training endpoint, and `do_prediction_op` with the prediction endpoint. You can use them if the other tools in this package don't provide what you need.
+#' @seealso
+#' [`customvision_training_endpoint`], [`customvision_prediction_endpoint`],
+#' [`customvision_project`], [`customvision_predictive_service`], [`call_cognitive_endpoint`]
+#' @rdname do_customvision_op
 #' @export
-call_cognitive_endpoint.computervision_endpoint <- function(endpoint, ...)
+do_training_op <- function(project, ...)
 {
-    NextMethod()
+    UseMethod("do_training_op")
 }
 
 
-# #' @export
-# call_cognitive_endpoint.face_endpoint <- function(endpoint, ...)
-# {
-#     NextMethod()
-# }
-
-
+#' @rdname do_customvision_op
 #' @export
-call_cognitive_endpoint.customvision_training_endpoint <- function(endpoint, ...)
+do_training_op.customvision_project <- function(project, op, ...)
 {
-    NextMethod()
-}
-
-
-#' @export
-call_cognitive_endpoint.customvision_prediction_endpoint <- function(endpoint, ...)
-{
-    NextMethod()
-}
-
-
-do_training_op <- function(project, op, ...)
-{
-    if(!inherits(project, "customvision_project"))
-        stop("First argument must be a Custom Vision project", call.=FALSE)
     op <- file.path("training/projects", project$project$id, op)
     call_cognitive_endpoint(project$endpoint, op, ...)
 }
 
 
-do_prediction_op <- function(object, op, ...)
+#' @rdname do_customvision_op
+#' @export
+do_prediction_op <- function(service, ...)
 {
-    if(!inherits(object, "customvision_predictive_service"))
-        stop("First argument must be a Custom Vision predictive service", call.=FALSE)
-    op <- file.path("prediction", object$project, op)
-    call_cognitive_endpoint(object$endpoint, op, ...)
+    UseMethod("do_prediction_op")
+}
+
+
+#' @rdname do_customvision_op
+#' @export
+do_prediction_op.customvision_predictive_service <- function(service, op, ...)
+{
+    op <- file.path("prediction", service$project, op)
+    call_cognitive_endpoint(service$endpoint, op, ...)
 }
 
 

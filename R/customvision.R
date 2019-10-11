@@ -54,7 +54,7 @@ print.customvision_project <- function(x, ...)
 #' @return
 #' `delete_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
 #' @seealso
-#' [`customvision_training_endpoint`], [`add_images`], [`train_model`], [`publish_model`], [`predict.customvision_model`]
+#' [`customvision_training_endpoint`], [`add_images`], [`train_model`], [`publish_model`], [`predict.customvision_model`], [`do_training_op`]
 #' @aliases customvision_project
 #' @rdname customvision_project
 #' @export

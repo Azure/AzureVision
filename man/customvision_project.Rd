@@ -64,5 +64,5 @@ By default, a Custom Vision project does not support exporting the model; this a
 Setting \code{export_target="vaidk"} allows exporting to Vision AI Development Kit format, in addition to the above.
 }
 \seealso{
-\code{\link{customvision_training_endpoint}}, \code{\link{add_images}}, \code{\link{train_model}}, \code{\link{publish_model}}, \code{\link{predict.customvision_model}}
+\code{\link{customvision_training_endpoint}}, \code{\link{add_images}}, \code{\link{train_model}}, \code{\link{publish_model}}, \code{\link{predict.customvision_model}}, \code{\link{do_training_op}}
 }
