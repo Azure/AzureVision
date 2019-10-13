@@ -19,9 +19,9 @@ remove_images(project, image_ids = list_images(project, "untagged", as =
 
 \item{images}{For \code{add_images}, the images to add (upload) to the project.}
 
-\item{tags}{For \code{add_images}, optional tags to add to the images. Used for classification projects.}
+\item{tags}{For \code{add_images}, optional tags to add to the images.}
 
-\item{regions}{For \code{add_images}, an optional list of regions in the images that contain objects. Used for object detection projects.}
+\item{regions}{For \code{add_images}, an optional list of regions in the images that contain objects. Only used for object detection projects.}
 
 \item{include}{For \code{list_images}, which images to include in the list: untagged, tagged, or both (the default).}
 
@@ -51,7 +51,7 @@ The images to be uploaded can be specified as:
 \item A raw vector, or a list of raw vectors, holding the binary contents of the image files.
 }
 
-Uploaded images can be \emph{tagged} (for a classification project), which set the target labels for each image. To specify a single tag per image, set \code{tags} to be a vector. For multiple tags per image, \code{tags} should be a list, with each component being the vector of tags for the corresponding image. If \code{tags} has length 1, it is recycled to the length of \code{images} as a convenience feature for giving multiple images the same tag.
+Uploaded images can be \emph{tagged}, which set the target labels for each image. To specify a single tag per image, set \code{tags} to be a vector. For multiple tags per image, \code{tags} should be a list, with each component being the vector of tags for the corresponding image. If \code{tags} has length 1, it is recycled to the length of \code{images} as a convenience feature for giving multiple images the same tag.
 
 Specifying regions is used for an object detection project. The \code{regions} argument should be a nested list, with each component specifying the regions for the corresponding image.
 

@@ -61,6 +61,11 @@ test_that("Adding and tagging images works",
 
     tags <- list_tags(proj)
     expect_true("negtag" %in% tags)
+
+    untagged_ids <- untag_uploaded_images(proj, list_images(proj))
+    expect_type(untagged_ids, "character")
+
+    expect_true(is_empty(list_images(proj, "tagged")))
 })
 
 
