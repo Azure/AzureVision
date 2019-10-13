@@ -75,7 +75,7 @@ Interface to Azure Computer Vision API
 
 \code{area_of_interest} attempts to find the "interesting" part of an image, meaning the most likely location of the image's subject.
 
-\code{tag} returns a set of words that are relevant to the content of the image. Not to be confused with the \code{\link{add_tags}} or \code{\link{tag_uploaded_images}} functions that are part of the Custom Vision API.
+\code{tag} returns a set of words that are relevant to the content of the image. Not to be confused with the \code{\link{add_tags}} or \code{\link{add_image_tags}} functions that are part of the Custom Vision API.
 
 \code{categorize} attempts to place the image into a list of predefined categories.
 

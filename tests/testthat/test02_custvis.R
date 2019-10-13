@@ -50,7 +50,7 @@ test_that("Adding and tagging images works",
     expect_type(untagged_ids, "character")
     expect_identical(sort(untagged_ids), sort(img_loc))
 
-    tagged_ids <- tag_uploaded_images(proj, list(c("can", "object"), c("carton", "object")), img_loc)
+    tagged_ids <- add_image_tags(proj, list(c("can", "object"), c("carton", "object")), img_loc)
     expect_identical(tagged_ids, img_loc)
 
     tags <- list_tags(proj)
@@ -62,7 +62,7 @@ test_that("Adding and tagging images works",
     tags <- list_tags(proj)
     expect_true("negtag" %in% tags)
 
-    untagged_ids <- untag_uploaded_images(proj, list_images(proj))
+    untagged_ids <- remove_image_tags(proj, list_images(proj))
     expect_type(untagged_ids, "character")
 
     expect_true(is_empty(list_images(proj, "tagged")))

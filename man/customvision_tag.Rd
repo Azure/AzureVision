@@ -50,5 +50,5 @@ You can add a negative tag to a project with the \code{add_negative_tag} method.
 }
 
 \seealso{
-\code{\link{tag_uploaded_images}}, \code{\link{untag_uploaded_images}}
+\code{\link{add_image_tags}}, \code{\link{remove_image_tags}}
 }

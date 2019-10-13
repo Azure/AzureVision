@@ -58,7 +58,7 @@ Specifying regions is used for an object detection project. The \code{regions} a
 Note that once uploaded, images are identified only by their ID; there is no general link back to the source filename or URL.
 }
 \seealso{
-\code{\link{tag_uploaded_images}} to add tags to images if not done at upload time, \code{\link{untag_uploaded_images}}
+\code{\link{add_image_tags}} to add tags to images if not done at upload time, \code{\link{remove_image_tags}}
 
 \code{\link{add_tags}}, \code{\link{list_tags}}, \code{\link{remove_tags}}
 

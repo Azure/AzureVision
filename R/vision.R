@@ -21,7 +21,7 @@
 #'
 #' `area_of_interest` attempts to find the "interesting" part of an image, meaning the most likely location of the image's subject.
 #'
-#' `tag` returns a set of words that are relevant to the content of the image. Not to be confused with the [`add_tags`] or [`tag_uploaded_images`] functions that are part of the Custom Vision API.
+#' `tag` returns a set of words that are relevant to the content of the image. Not to be confused with the [`add_tags`] or [`add_image_tags`] functions that are part of the Custom Vision API.
 #'
 #' `categorize` attempts to place the image into a list of predefined categories.
 #'

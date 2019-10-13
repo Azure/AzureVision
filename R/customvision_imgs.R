@@ -28,7 +28,7 @@
 #'
 #' For `remove_images`, NULL on successful removal.
 #' @seealso
-#' [`tag_uploaded_images`] to add tags to images if not done at upload time, [`untag_uploaded_images`]
+#' [`add_image_tags`] to add tags to images if not done at upload time, [`remove_image_tags`]
 #'
 #' [`add_tags`], [`list_tags`], [`remove_tags`]
 #'
@@ -59,7 +59,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 
     img_ids <- sapply(lst, function(x) x$id)
     if(!is_empty(tags))
-        tag_uploaded_images(project, tags, img_ids)
+        add_image_tags(project, tags, img_ids)
 
     img_ids
 }

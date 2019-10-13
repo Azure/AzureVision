@@ -17,7 +17,7 @@
 #'
 #' You can add a negative tag to a project with the `add_negative_tag` method. Once defined, a negative tag is treated like any other tag. A project can only have one negative tag defined.
 #' @seealso
-#' [`tag_uploaded_images`], [`untag_uploaded_images`]
+#' [`add_image_tags`], [`remove_image_tags`]
 #' @rdname customvision_tag
 #' @export
 add_tags <- function(project, tags)
@@ -113,17 +113,17 @@ remove_tags <- function(project, tags, confirm=TRUE)
 #' Tag and untag images uploaded to a project
 #'
 #' @param project a Custom Vision project.
-#' @param tags For `tag_uploaded_images`, the tag labels to add to the images. For `untag_uploaded_images`, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.
+#' @param tags For `add_image_tags`, the tag labels to add to the images. For `remove_image_tags`, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.
 #' @param image_ids The IDs of the images to tag or untag.
 #' @details
-#' `tag_uploaded_images` is for tagging images that were uploaded previously, while `untag_uploaded_images` untags them. Adding tags does not remove previously assigned ones. Similarly, removing one tag from an image leaves any other tags intact.
+#' `add_image_tags` is for tagging images that were uploaded previously, while `remove_image_tags` untags them. Adding tags does not remove previously assigned ones. Similarly, removing one tag from an image leaves any other tags intact.
 #' @return
 #' The vector of IDs for the images affected, invisibly.
 #' @seealso
 #' [`add_images`], [`list_tags`]
 #' @rdname customvision_tag_image
 #' @export
-tag_uploaded_images <- function(project, tags, image_ids=list_images(project, "untagged", as="ids"))
+add_image_tags <- function(project, tags, image_ids=list_images(project, "untagged", as="ids"))
 {
     if(length(tags) != length(image_ids) && length(tags) != 1)
         stop("Must supply tags for each image", call.=FALSE)
@@ -155,15 +155,14 @@ tag_uploaded_images <- function(project, tags, image_ids=list_images(project, "u
         do_training_op(project, "images/tags", body=list(tags=do.call(rbind, req_list[idx])), http_verb="POST")
         req_list <- req_list[-idx]
     }
-    #do_training_op(project, "images/tags", body=list(tags=do.call(rbind, req_list)), http_verb="POST")
     invisible(image_ids)
 }
 
 
 #' @rdname customvision_tag_image
 #' @export
-untag_uploaded_images <- function(project, image_ids=list_images(project, "tagged", as="ids"),
-                                  tags=list_tags(project, as="ids"))
+remove_image_tags <- function(project, image_ids=list_images(project, "tagged", as="ids"),
+                              tags=list_tags(project, as="ids"))
 {
     if(!all(is_guid(tags)))
     {
@@ -182,7 +181,6 @@ untag_uploaded_images <- function(project, image_ids=list_images(project, "tagge
         do_training_op(project, "images/tags", options=opts, http_verb="DELETE")
         tmp_imgs <- tmp_imgs[-idx]
     }
-    #do_training_op(project, "images/tags", options=opts, http_verb="DELETE")
     invisible(image_ids)
 }
 
