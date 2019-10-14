@@ -2,6 +2,7 @@
 % Please edit documentation in R/customvision_imgs.R
 \name{add_images}
 \alias{add_images}
+\alias{customvision_images}
 \alias{list_images}
 \alias{remove_images}
 \title{Add, list and remove images for a project}

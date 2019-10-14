@@ -2,6 +2,7 @@
 % Please edit documentation in R/customvision_tags.R
 \name{add_tags}
 \alias{add_tags}
+\alias{customvision_tags}
 \alias{add_negative_tag}
 \alias{list_tags}
 \alias{get_tag}

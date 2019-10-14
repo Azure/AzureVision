@@ -8,6 +8,7 @@ AzureCognitive::cognitive_endpoint
 #' @export
 AzureCognitive::call_cognitive_endpoint
 
+utils::globalVariables("id")
 
 confirm_delete <- function(msg, confirm)
 {

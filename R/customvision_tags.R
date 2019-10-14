@@ -18,7 +18,8 @@
 #' You can add a negative tag to a project with the `add_negative_tag` method. Once defined, a negative tag is treated like any other tag. A project can only have one negative tag defined.
 #' @seealso
 #' [`add_image_tags`], [`remove_image_tags`]
-#' @rdname customvision_tag
+#' @rdname customvision_tags
+#' @aliases customvision_tags
 #' @export
 add_tags <- function(project, tags)
 {
@@ -37,7 +38,7 @@ add_tags <- function(project, tags)
 }
 
 
-#' @rdname customvision_tag
+#' @rdname customvision_tags
 #' @export
 add_negative_tag <- function(project, negative_name="_negative_")
 {
@@ -60,7 +61,7 @@ add_negative_tag <- function(project, negative_name="_negative_")
 }
 
 
-#' @rdname customvision_tag
+#' @rdname customvision_tags
 #' @export
 list_tags <- function(project, as=c("names", "ids", "dataframe", "list"), iteration=NULL)
 {
@@ -77,7 +78,7 @@ list_tags <- function(project, as=c("names", "ids", "dataframe", "list"), iterat
 }
 
 
-#' @rdname customvision_tag
+#' @rdname customvision_tags
 #' @export
 get_tag <- function(project, name=NULL, id=NULL, iteration=NULL)
 {
@@ -95,7 +96,7 @@ get_tag <- function(project, name=NULL, id=NULL, iteration=NULL)
 }
 
 
-#' @rdname customvision_tag
+#' @rdname customvision_tags
 #' @export
 remove_tags <- function(project, tags, confirm=TRUE)
 {
@@ -117,20 +118,24 @@ remove_tags <- function(project, tags, confirm=TRUE)
 #' @param image_ids The IDs of the images to tag or untag.
 #' @details
 #' `add_image_tags` is for tagging images that were uploaded previously, while `remove_image_tags` untags them. Adding tags does not remove previously assigned ones. Similarly, removing one tag from an image leaves any other tags intact.
+#'
+#' Tags can be specified in the following ways:
+#' - As a single character string. In this case, the tag will be applied to all image IDs.
+#' - As a vector of strings, with length equal to the length of `image_ids`. The tags will be applied to the images in order.
+#' - As a list of vectors of strings, with the length of the list equal to the length of `image_ids`. Each vector in the list contains the tags to be assigned to the corresponding image.
 #' @return
 #' The vector of IDs for the images affected, invisibly.
 #' @seealso
 #' [`add_images`], [`list_tags`]
-#' @rdname customvision_tag_image
+#' @rdname customvision_image_tags
+#' @aliases customvision_image_tags
 #' @export
-add_image_tags <- function(project, tags, image_ids=list_images(project, "untagged", as="ids"))
+add_image_tags <- function(project, image_ids=list_images(project, "untagged", as="ids"), tags)
 {
     if(length(tags) != length(image_ids) && length(tags) != 1)
         stop("Must supply tags for each image", call.=FALSE)
 
-    if(any(is_guid(tags)))
-        warning("'tags' argument should be tag names (did you supply a list of image IDs?)", call.=FALSE)
-    if(!all(is_guid(image_ids)))
+    if(!all(sapply(image_ids, is_guid)))
         stop("Must provide GUIDs of images to be tagged", call.=FALSE)
 
     unique_tags <- unique_tags(tags)
@@ -159,15 +164,18 @@ add_image_tags <- function(project, tags, image_ids=list_images(project, "untagg
 }
 
 
-#' @rdname customvision_tag_image
+#' @rdname customvision_image_tags
 #' @export
 remove_image_tags <- function(project, image_ids=list_images(project, "tagged", as="ids"),
                               tags=list_tags(project, as="ids"))
 {
-    if(!all(is_guid(tags)))
+    if(!all(sapply(image_ids, is_guid)))
+        stop("Must provide GUIDs of images to be untagged", call.=FALSE)
+
+    if(!all(sapply(tags, is_guid)))
     {
-        taglist <- list_tags(project, as="dataframe")[c("name", "id")]
-        tags <- taglist$id[match(tags, taglist$name)]
+        tagdf <- list_tags(project, as="dataframe")[c("name", "id")]
+        tags <- tagdf$id[match(tags, tagdf$name)]
     }
 
     tmp_imgs <- image_ids

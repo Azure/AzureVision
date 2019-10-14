@@ -33,7 +33,8 @@
 #' [`add_tags`], [`list_tags`], [`remove_tags`]
 #'
 #' [`customvision_project`]
-#' @rdname customvision_image
+#' @rdname customvision_images
+#' @aliases customvision_images
 #' @export
 add_images <- function(project, images, tags=NULL, regions=NULL)
 {
@@ -65,7 +66,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 }
 
 
-#' @rdname customvision_image
+#' @rdname customvision_images
 #' @export
 list_images <- function(project, include=c("all", "tagged", "untagged"), as=c("ids", "dataframe", "list"),
                         iteration=NULL)
@@ -116,7 +117,7 @@ list_images <- function(project, include=c("all", "tagged", "untagged"), as=c("i
 }
 
 
-#' @rdname customvision_image
+#' @rdname customvision_images
 #' @export
 remove_images <- function(project, image_ids=list_images(project, "untagged", as="ids"), confirm=TRUE)
 {

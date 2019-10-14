@@ -1,9 +1,29 @@
+#' Add and remove regions from images
+#'
+#' @param project A Custom Vision project.
+#' @param image_ids The IDs of the images for which to add or remove images.
+#' @param regions For `add_image_regions`, the regions to add. See 'Details' below.
+#' @param region_ids For `remove_image_regions`, a vector of region IDs. This is an alternative to image ID for specifying the regions to remove; if this is provided, `image_ids` is not used.
+#' @details
+#' The regions to add should be specified as a list of data frames, with one list component per image. Each data frame should have one row per region to add, and the following columns:
+#' - `left`, `top`, `width`, `height`: the location and dimensions of the region bounding box.
+#' - Either `tag`, the name of the tag to associate with the region, or `tag_id`, the GUID of the tag. All tags must have previously been added to the project, either via [`add_tags`] or [`add_image_tags`].
+#' Any other columns in the data frame will be ignored.
+#'
+#' @return
+#' For `add_image_regions`, a data frame containing the details on the added regions.
+#'
+#' For `remove_image_regions`, the value of `image_ids` invisibly, if this argument was provided; NULL otherwise.
+#' @rdname customvision_image_regions
+#' @export
 add_image_regions <- function(project, image_ids, regions)
 {
-    tag_ids <- local({
-        tagdf <- list_tags(project, as="dataframe")[c("name", "id")]
-        structure(tagdf$id, names=tagdf$name)
-    })
+    if(!all(sapply(image_ids, is_guid)))
+        stop("Must provide GUIDs of images to add regions to", call.=FALSE)
+
+    tagdf <- list_tags(project, as="dataframe")[c("name", "id")]
+    tag_ids <- tagdf$id
+    names(tag_ids) <- tagdf$name
 
     regions <- mapply(
         function(region_df, img)
@@ -21,13 +41,26 @@ add_image_regions <- function(project, image_ids, regions)
         regions, image_ids, SIMPLIFY=FALSE
     )
 
-    body <- list(regions=do.call(rbind, regions))
-    do_training_op(project, "images/regions", body=body, http_verb="POST", simplifyDataFrame=TRUE)$created
+    regions <- do.call(rbind, regions)
+    lst <- list()
+    while(nrow(regions) > 0)
+    {
+        idx <- seq_len(min(nrow(regions), 64))
+        body <- list(regions=regions[idx, ])
+        res <- do_training_op(project, "images/regions", body=body, http_verb="POST", simplifyDataFrame=TRUE)$created
+        lst <- c(lst, list(res))
+        regions <- regions[-idx, ]
+    }
+    do.call(rbind, lst)
 }
 
 
+#' @export
 remove_image_regions <- function(project, image_ids, region_ids=NULL)
 {
+    if(!missing(image_ids) && !all(sapply(image_ids, is_guid)))
+        stop("Must provide GUIDs of images to be tagged", call.=FALSE)
+
     if(is_empty(region_ids))
     {
         region_dflst <- subset(list_images(project, "tagged", as="dataframe"), id %in% image_ids)$regions
@@ -48,6 +81,7 @@ remove_image_regions <- function(project, image_ids, region_ids=NULL)
 }
 
 
+#' @export
 identify_regions <- function(project, image)
 {
     image_id <- if(is.character(image) && is_guid(image))

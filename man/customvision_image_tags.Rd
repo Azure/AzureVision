@@ -2,11 +2,12 @@
 % Please edit documentation in R/customvision_tags.R
 \name{add_image_tags}
 \alias{add_image_tags}
+\alias{customvision_image_tags}
 \alias{remove_image_tags}
 \title{Tag and untag images uploaded to a project}
 \usage{
-add_image_tags(project, tags, image_ids = list_images(project,
-  "untagged", as = "ids"))
+add_image_tags(project, image_ids = list_images(project, "untagged", as =
+  "ids"), tags)
 
 remove_image_tags(project, image_ids = list_images(project, "tagged", as
   = "ids"), tags = list_tags(project, as = "ids"))
@@ -14,9 +15,9 @@ remove_image_tags(project, image_ids = list_images(project, "tagged", as
 \arguments{
 \item{project}{a Custom Vision project.}
 
-\item{tags}{For \code{add_image_tags}, the tag labels to add to the images. For \code{remove_image_tags}, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.}
-
 \item{image_ids}{The IDs of the images to tag or untag.}
+
+\item{tags}{For \code{add_image_tags}, the tag labels to add to the images. For \code{remove_image_tags}, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.}
 }
 \value{
 The vector of IDs for the images affected, invisibly.
@@ -26,6 +27,13 @@ Tag and untag images uploaded to a project
 }
 \details{
 \code{add_image_tags} is for tagging images that were uploaded previously, while \code{remove_image_tags} untags them. Adding tags does not remove previously assigned ones. Similarly, removing one tag from an image leaves any other tags intact.
+
+Tags can be specified in the following ways:
+\itemize{
+\item As a single character string. In this case, the tag will be applied to all image IDs.
+\item As a vector of strings, with length equal to the length of \code{image_ids}. The tags will be applied to the images in order.
+\item As a list of vectors of strings, with the length of the list equal to the length of \code{image_ids}. Each vector in the list contains the tags to be assigned to the corresponding image.
+}
 }
 \seealso{
 \code{\link{add_images}}, \code{\link{list_tags}}
