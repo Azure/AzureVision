@@ -2,18 +2,26 @@
 % Please edit documentation in R/customvision_regions.R
 \name{add_image_regions}
 \alias{add_image_regions}
+\alias{remove_image_regions}
+\alias{identify_regions}
 \title{Add and remove regions from images}
 \usage{
 add_image_regions(project, image_ids, regions)
+
+remove_image_regions(project, image_ids, region_ids = NULL)
+
+identify_regions(project, image)
 }
 \arguments{
 \item{project}{A Custom Vision project.}
 
-\item{image_ids}{The IDs of the images for which to add or remove images.}
+\item{image_ids}{For \code{add_image_regions} and \code{remove_image_regions}, the IDs of the images for which to add or remove images.}
 
 \item{regions}{For \code{add_image_regions}, the regions to add. See 'Details' below.}
 
 \item{region_ids}{For \code{remove_image_regions}, a vector of region IDs. This is an alternative to image ID for specifying the regions to remove; if this is provided, \code{image_ids} is not used.}
+
+\item{image}{For \code{identify_regions}, an image for which to identify possible regions in which an object exists. This can be the ID of an image that was previously uploaded to the project; if not, the image is uploaded. Otherwise, see \code{add_images} for how to specify an image to upload.}
 }
 \value{
 For \code{add_image_regions}, a data frame containing the details on the added regions.

@@ -1,7 +1,8 @@
 #' Add and remove regions from images
 #'
 #' @param project A Custom Vision project.
-#' @param image_ids The IDs of the images for which to add or remove images.
+#' @param image_ids For `add_image_regions` and `remove_image_regions`, the IDs of the images for which to add or remove images.
+#' @param image For `identify_regions`, an image for which to identify possible regions in which an object exists. This can be the ID of an image that was previously uploaded to the project; if not, the image is uploaded. Otherwise, see `add_images` for how to specify an image to upload.
 #' @param regions For `add_image_regions`, the regions to add. See 'Details' below.
 #' @param region_ids For `remove_image_regions`, a vector of region IDs. This is an alternative to image ID for specifying the regions to remove; if this is provided, `image_ids` is not used.
 #' @details
@@ -55,6 +56,7 @@ add_image_regions <- function(project, image_ids, regions)
 }
 
 
+#' @rdname customvision_image_regions
 #' @export
 remove_image_regions <- function(project, image_ids, region_ids=NULL)
 {
@@ -81,6 +83,7 @@ remove_image_regions <- function(project, image_ids, region_ids=NULL)
 }
 
 
+#' @rdname customvision_image_regions
 #' @export
 identify_regions <- function(project, image)
 {
