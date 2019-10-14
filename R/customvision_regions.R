@@ -26,8 +26,6 @@ add_image_regions <- function(project, image_ids, regions)
 }
 
 
-utils::globalVariables(c("id"))
-
 remove_image_regions <- function(project, image_ids, region_ids=NULL)
 {
     if(is_empty(region_ids))
@@ -36,8 +34,13 @@ remove_image_regions <- function(project, image_ids, region_ids=NULL)
         region_ids <- do.call(rbind, region_dflst)$regionId
     }
 
-    opts <- list(regionIds=paste0(region_ids, collapse=","))
-    do_training_op(project, "images/regions", options=opts, http_verb="DELETE")
+    while(!is_empty(region_ids))
+    {
+        idx <- seq_len(min(length(region_ids), 64))
+        opts <- list(regionIds=paste0(region_ids[idx], collapse=","))
+        do_training_op(project, "images/regions", options=opts, http_verb="DELETE")
+        region_ids <- region_ids[-idx]
+    }
 
     if(missing(image_ids))
         invisible(NULL)
