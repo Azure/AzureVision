@@ -23,6 +23,10 @@ add_image_regions <- function(project, image_ids, regions)
         stop("Must provide GUIDs of images to add regions to", call.=FALSE)
 
     tagdf <- list_tags(project, as="dataframe")[c("name", "id")]
+    region_tags <- unique_tags(lapply(regions, `[[`, "tag"))
+    if(!all(region_tags %in% tagdf$name))
+        tagdf <- rbind(tagdf, add_tags(project, setdiff(region_tags, tagdf$name)))
+
     tag_ids <- tagdf$id
     names(tag_ids) <- tagdf$name
 

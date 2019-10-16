@@ -3,12 +3,13 @@
 #' @param project A Custom Vision project.
 #' @param images For `add_images`, the images to add (upload) to the project.
 #' @param image_ids For `remove_images`, the IDs of the images to remove from the project.
-#' @param tags For `add_images`, optional tags to add to the images.
-#' @param regions For `add_images`, an optional list of regions in the images that contain objects. Only used for object detection projects.
+#' @param tags For `add_images.classification_project`, optional tags to add to the images.
+#' @param regions For `add_images.object_detection_project`, an optional list of regions in the images that contain objects. Only used for object detection projects.
 #' @param include For `list_images`, which images to include in the list: untagged, tagged, or both (the default).
 #' @param as For `list_images`, the return value: a vector of image IDs, a data frame of image metadata, or a list of metadata.
 #' @param iteration For `list_images`, the iteration ID (roughly, which model generation to use). Defaults to the latest iteration.
 #' @param confirm For `remove_images`, whether to ask for confirmation first.
+#' @param ... Arguments passed to lower-level functions.
 #' @details
 #' The images to be uploaded can be specified as:
 #' - A vector of local filenames. All common image file formats are supported.
@@ -36,7 +37,31 @@
 #' @rdname customvision_images
 #' @aliases customvision_images
 #' @export
-add_images <- function(project, images, tags=NULL, regions=NULL)
+add_images <- function(project, ...)
+{
+    UseMethod("add_images")
+}
+
+
+add_images.classification_project <- function(project, images, tags=NULL, ...)
+{
+    img_ids <- add_images_internal(project, images)
+    if(!is_empty(tags))
+        add_image_tags(project, img_ids, tags)
+    img_ids
+}
+
+
+add_images.object_detection_project <- function(project, images, regions=NULL, ...)
+{
+    img_ids <- add_images_internal(project, images)
+    if(!is_empty(regions))
+        add_image_regions(project, img_ids, regions)
+    img_ids
+}
+
+
+add_images_internal <- function(project, images)
 {
     bodies <- images_to_bodies(images)
     src_names <- names(bodies)
@@ -59,11 +84,8 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
     lst <- lapply(lst[match(src_names, srcs)], `[[`, "image")
 
     img_ids <- sapply(lst, function(x) x$id)
-    if(!is_empty(tags))
-        add_image_tags(project, img_ids, tags)
-
-    img_ids
 }
+
 
 
 #' @rdname customvision_images
@@ -159,19 +181,6 @@ browse_image <- function(project, img_id, which=c("resized", "original", "thumbn
         thumbnail=res[[1]]$thumbnailUri
     )
     httr::BROWSE(img_url)
-}
-
-
-get_tag_ids_from_names <- function(tagnames, project)
-{
-    tagdf <- list_tags(project, as="dataframe")
-    unname(structure(tagdf$id, names=tagdf$name)[tagnames])
-}
-
-
-unique_tags <- function(tags)
-{
-    if(is.list(tags)) unique(unlist(tags)) else unique(tags)
 }
 
 

@@ -16,6 +16,8 @@
 #' A _negative tag_ is a special tag that represents the absence of any other tag. For example, if a project is classifying images into cats and dogs, an image that doesn't contain either a cat or dog should be given a negative tag. This can be distinguished from an _untagged_ image, where there is no information at all on what it contains.
 #'
 #' You can add a negative tag to a project with the `add_negative_tag` method. Once defined, a negative tag is treated like any other tag. A project can only have one negative tag defined.
+#' @return
+#' `add_tags` and `add_negative_tag` return a data frame containing the names and IDs of the tags added.
 #' @seealso
 #' [`add_image_tags`], [`remove_image_tags`]
 #' @rdname customvision_tags
@@ -53,7 +55,7 @@ add_negative_tag <- function(project, negative_name="_negative_")
     res <- if(negative_name %in% taglist$name)
     {
         tagid <- taglist$id[which(negative_name == taglist$name)]
-        do_training_op(project, file.path("tags", tagid), body=list(type="Negative"), http_verb="PATCH")
+        do_training_op(project, file.path("tags", tagid), body=list(name=negative_name, type="Negative"), http_verb="PATCH")
     }
     else do_training_op(project, "tags", options=list(name=negative_name, type="Negative"), http_verb="POST")
 
@@ -190,5 +192,18 @@ remove_image_tags <- function(project, image_ids=list_images(project, "tagged", 
         tmp_imgs <- tmp_imgs[-idx]
     }
     invisible(image_ids)
+}
+
+
+get_tag_ids_from_names <- function(tagnames, project)
+{
+    tagdf <- list_tags(project, as="dataframe")
+    unname(structure(tagdf$id, names=tagdf$name)[tagnames])
+}
+
+
+unique_tags <- function(tags)
+{
+    if(is.list(tags)) unique(unlist(tags)) else unique(tags)
 }
 
