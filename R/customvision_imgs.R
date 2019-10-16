@@ -60,7 +60,7 @@ add_images <- function(project, images, tags=NULL, regions=NULL)
 
     img_ids <- sapply(lst, function(x) x$id)
     if(!is_empty(tags))
-        add_image_tags(project, tags, img_ids)
+        add_image_tags(project, img_ids, tags)
 
     img_ids
 }
