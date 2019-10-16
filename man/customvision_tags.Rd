@@ -35,6 +35,9 @@ remove_tags(project, tags, confirm = TRUE)
 
 \item{confirm}{For \code{remove_tags}, whether to ask for confirmation first.}
 }
+\value{
+\code{add_tags} and \code{add_negative_tag} return a data frame containing the names and IDs of the tags added.
+}
 \description{
 Add, retrieve and remove tags for a project
 }

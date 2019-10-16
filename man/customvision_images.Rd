@@ -3,11 +3,19 @@
 \name{add_images}
 \alias{add_images}
 \alias{customvision_images}
+\alias{add_images.classification_project}
+\alias{add_images.object_detection_project}
 \alias{list_images}
 \alias{remove_images}
 \title{Add, list and remove images for a project}
 \usage{
-add_images(project, images, tags = NULL, regions = NULL)
+add_images(project, ...)
+
+\method{add_images}{classification_project}(project, images, tags = NULL,
+  ...)
+
+\method{add_images}{object_detection_project}(project, images,
+  regions = NULL, ...)
 
 list_images(project, include = c("all", "tagged", "untagged"),
   as = c("ids", "dataframe", "list"), iteration = NULL)
@@ -18,11 +26,13 @@ remove_images(project, image_ids = list_images(project, "untagged", as =
 \arguments{
 \item{project}{A Custom Vision project.}
 
+\item{...}{Arguments passed to lower-level functions.}
+
 \item{images}{For \code{add_images}, the images to add (upload) to the project.}
 
-\item{tags}{For \code{add_images}, optional tags to add to the images.}
+\item{tags}{For \code{add_images.classification_project}, optional tags to add to the images.}
 
-\item{regions}{For \code{add_images}, an optional list of regions in the images that contain objects. Only used for object detection projects.}
+\item{regions}{For \code{add_images.object_detection_project}, an optional list of regions in the images that contain objects. Only used for object detection projects.}
 
 \item{include}{For \code{list_images}, which images to include in the list: untagged, tagged, or both (the default).}
 

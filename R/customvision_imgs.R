@@ -34,8 +34,8 @@
 #' [`add_tags`], [`list_tags`], [`remove_tags`]
 #'
 #' [`customvision_project`]
-#' @rdname customvision_images
 #' @aliases customvision_images
+#' @rdname customvision_images
 #' @export
 add_images <- function(project, ...)
 {
@@ -43,6 +43,8 @@ add_images <- function(project, ...)
 }
 
 
+#' @rdname customvision_images
+#' @export
 add_images.classification_project <- function(project, images, tags=NULL, ...)
 {
     img_ids <- add_images_internal(project, images)
@@ -52,6 +54,8 @@ add_images.classification_project <- function(project, images, tags=NULL, ...)
 }
 
 
+#' @rdname customvision_images
+#' @export
 add_images.object_detection_project <- function(project, images, regions=NULL, ...)
 {
     img_ids <- add_images_internal(project, images)
