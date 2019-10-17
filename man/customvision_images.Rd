@@ -30,9 +30,9 @@ remove_images(project, image_ids = list_images(project, "untagged", as =
 
 \item{images}{For \code{add_images}, the images to add (upload) to the project.}
 
-\item{tags}{For \code{add_images.classification_project}, optional tags to add to the images.}
+\item{tags}{Optional tags to add to the images. Only for classification projects.}
 
-\item{regions}{For \code{add_images.object_detection_project}, an optional list of regions in the images that contain objects. Only used for object detection projects.}
+\item{regions}{Optional list of regions in the images that contain objects. Only for object detection projects.}
 
 \item{include}{For \code{list_images}, which images to include in the list: untagged, tagged, or both (the default).}
 
@@ -69,7 +69,7 @@ Specifying regions is used for an object detection project. The \code{regions} a
 Note that once uploaded, images are identified only by their ID; there is no general link back to the source filename or URL.
 }
 \seealso{
-\code{\link{add_image_tags}} to add tags to images if not done at upload time, \code{\link{remove_image_tags}}
+\code{\link{add_image_tags}} and \code{\link{add_image_regions}} to add tags and regions to images if not done at upload time
 
 \code{\link{add_tags}}, \code{\link{list_tags}}, \code{\link{remove_tags}}
 

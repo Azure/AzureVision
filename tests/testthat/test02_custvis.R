@@ -50,7 +50,7 @@ test_that("Adding and tagging images works",
     expect_type(untagged_ids, "character")
     expect_identical(sort(untagged_ids), sort(img_loc))
 
-    tagged_ids <- add_image_tags(proj, list(c("can", "object"), c("carton", "object")), img_loc)
+    tagged_ids <- add_image_tags(proj, img_loc, list(c("can", "object"), c("carton", "object")))
     expect_identical(tagged_ids, img_loc)
 
     tags <- list_tags(proj)

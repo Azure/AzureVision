@@ -10,7 +10,7 @@ publish_model(model, name, prediction_resource)
 
 unpublish_model(model, confirm = TRUE)
 
-export_model(model, format, download = TRUE)
+export_model(model, format, download = TRUE, destfile = NULL)
 }
 \arguments{
 \item{model}{A Custom Vision model iteration object.}
@@ -24,6 +24,8 @@ export_model(model, format, download = TRUE)
 \item{format}{For \code{export_model}, the format to export to. See below for supported formats.}
 
 \item{download}{For \code{export_model}, whether to download the exported model.}
+
+\item{destfile}{For \code{export_model}, the destination file for downloading (if \code{download} is TRUE).}
 }
 \value{
 \code{export_model} returns the URL of the exported file, invisibly if \code{download=TRUE}.

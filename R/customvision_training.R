@@ -181,6 +181,7 @@ summary.customvision_model <- function(object, ...)
 #' @param prediction_resource For `publish_model`, the Custom Vision prediction resource to publish to. This can either be a string containing the Azure resource ID, or an AzureRMR resource object.
 #' @param format For `export_model`, the format to export to. See below for supported formats.
 #' @param download For `export_model`, whether to download the exported model.
+#' @param destfile For `export_model`, the destination file for downloading (if `download` is TRUE).
 #' @param confirm For `unpublish_model`, whether to ask for confirmation first.
 #' @details
 #' Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format in Azure storage, which can then be downloaded. Each iteration of the model can be published or exported separately.
@@ -223,7 +224,7 @@ unpublish_model <- function(model, confirm=TRUE)
 
 #' @rdname customvision_publish
 #' @export
-export_model <- function(model, format, download=TRUE)
+export_model <- function(model, format, download=TRUE, destfile=NULL)
 {
     settings <- model$project$project$settings
 
@@ -248,9 +249,10 @@ export_model <- function(model, format, download=TRUE)
 
     if(download)
     {
-        target <- basename(httr::parse_url(res$downloadUri)$path)
-        message("Downloading to ", target)
-        utils::download.file(res$downloadUri, target)
+        if(is.null(destfile))
+            destfile <- basename(httr::parse_url(res$downloadUri)$path)
+        message("Downloading to ", destfile)
+        utils::download.file(res$downloadUri, destfile)
         invisible(res$downloadUri)
     }
     else res$downloadUri

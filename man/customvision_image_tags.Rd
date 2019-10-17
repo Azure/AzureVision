@@ -13,7 +13,7 @@ remove_image_tags(project, image_ids = list_images(project, "tagged", as
   = "ids"), tags = list_tags(project, as = "ids"))
 }
 \arguments{
-\item{project}{a Custom Vision project.}
+\item{project}{a Custom Vision classification project.}
 
 \item{image_ids}{The IDs of the images to tag or untag.}
 

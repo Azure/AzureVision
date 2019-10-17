@@ -13,7 +13,7 @@ remove_image_regions(project, image_ids, region_ids = NULL)
 identify_regions(project, image)
 }
 \arguments{
-\item{project}{A Custom Vision project.}
+\item{project}{A Custom Vision object detection project.}
 
 \item{image_ids}{For \code{add_image_regions} and \code{remove_image_regions}, the IDs of the images for which to add or remove images.}
 

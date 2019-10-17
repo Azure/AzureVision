@@ -115,7 +115,7 @@ remove_tags <- function(project, tags, confirm=TRUE)
 
 #' Tag and untag images uploaded to a project
 #'
-#' @param project a Custom Vision project.
+#' @param project a Custom Vision classification project.
 #' @param tags For `add_image_tags`, the tag labels to add to the images. For `remove_image_tags`, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.
 #' @param image_ids The IDs of the images to tag or untag.
 #' @details

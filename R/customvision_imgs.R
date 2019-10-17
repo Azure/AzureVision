@@ -3,8 +3,8 @@
 #' @param project A Custom Vision project.
 #' @param images For `add_images`, the images to add (upload) to the project.
 #' @param image_ids For `remove_images`, the IDs of the images to remove from the project.
-#' @param tags For `add_images.classification_project`, optional tags to add to the images.
-#' @param regions For `add_images.object_detection_project`, an optional list of regions in the images that contain objects. Only used for object detection projects.
+#' @param tags Optional tags to add to the images. Only for classification projects.
+#' @param regions Optional list of regions in the images that contain objects. Only for object detection projects.
 #' @param include For `list_images`, which images to include in the list: untagged, tagged, or both (the default).
 #' @param as For `list_images`, the return value: a vector of image IDs, a data frame of image metadata, or a list of metadata.
 #' @param iteration For `list_images`, the iteration ID (roughly, which model generation to use). Defaults to the latest iteration.
@@ -29,7 +29,7 @@
 #'
 #' For `remove_images`, NULL on successful removal.
 #' @seealso
-#' [`add_image_tags`] to add tags to images if not done at upload time, [`remove_image_tags`]
+#' [`add_image_tags`] and [`add_image_regions`] to add tags and regions to images if not done at upload time
 #'
 #' [`add_tags`], [`list_tags`], [`remove_tags`]
 #'
