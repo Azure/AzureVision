@@ -116,23 +116,33 @@ remove_tags <- function(project, tags, confirm=TRUE)
 #' Tag and untag images uploaded to a project
 #'
 #' @param project a Custom Vision classification project.
-#' @param tags For `add_image_tags`, the tag labels to add to the images. For `remove_image_tags`, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.
 #' @param image_ids The IDs of the images to tag or untag.
+#' @param tags For `add_image_tags`, the tag labels to add to the images. For `remove_image_tags`, the tags (either text labels or IDs) to remove from images. The default for untagging is to remove all assigned tags.
 #' @details
 #' `add_image_tags` is for tagging images that were uploaded previously, while `remove_image_tags` untags them. Adding tags does not remove previously assigned ones. Similarly, removing one tag from an image leaves any other tags intact.
 #'
 #' Tags can be specified in the following ways:
 #' - As a single character string. In this case, the tag will be applied to all image IDs.
 #' - As a vector of strings, with length equal to the length of `image_ids`. The tags will be applied to the images in order.
-#' - As a list of vectors of strings, with the length of the list equal to the length of `image_ids`. Each vector in the list contains the tags to be assigned to the corresponding image.
+#' - As a _list_ of vectors of strings, with the length of the list equal to the length of `image_ids`. Each vector in the list contains the tags to be assigned to the corresponding image.
 #' @return
 #' The vector of IDs for the images affected, invisibly.
 #' @seealso
-#' [`add_images`], [`list_tags`]
-#' @rdname customvision_image_tags
+#' [`add_images`], [`add_tags`]
+#'
+#' [`add_image_regions`] for object detection projects
 #' @aliases customvision_image_tags
+#' @rdname customvision_image_tags
 #' @export
-add_image_tags <- function(project, image_ids=list_images(project, "untagged", as="ids"), tags)
+add_image_tags <- function(project, image_ids, tags)
+{
+    UseMethod("add_image_tags")
+}
+
+
+#' @rdname customvision_image_tags
+#' @export
+add_image_tags.classification_project <- function(project, image_ids=list_images(project, "untagged"), tags)
 {
     if(length(tags) != length(image_ids) && length(tags) != 1)
         stop("Must supply tags for each image", call.=FALSE)

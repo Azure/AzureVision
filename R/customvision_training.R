@@ -23,6 +23,8 @@ print.customvision_model <- function(x, ...)
 #' @details
 #' Training a Custom Vision model results in a _model iteration_. Each iteration is based on the current set of images uploaded to the endpoint. Successive model iterations trained on different image sets do not overwrite previous ones.
 #'
+#' You must have at least 5 images per tag for a classification project, and 15 images per tag for an object detection project, before you can train a model.
+#'
 #' By default, AzureVision will use the latest model iteration for actions such as prediction, showing performance statistics, and so on. You can list the model iterations with `list_models`, and retrieve a specific iteration by passing the iteration ID to `get_model`.
 #' @return
 #' For `train_model` and `get_model`, an object of class `customvision_model` which is a handle to the iteration.
@@ -126,7 +128,7 @@ delete_model.customvision_model <- function(object, confirm=TRUE, ...)
     if(!confirm_delete("Are you sure you want to delete this model iteration?", confirm))
         return(invisible(NULL))
 
-    do_training_op(object$project, file.path("iterations", object$iteration), http_verb="DELETE")
+    do_training_op(object$project, file.path("iterations", object$id), http_verb="DELETE")
     invisible(NULL)
 }
 

@@ -57,19 +57,29 @@ Add, list and remove images for a project
 \details{
 The images to be uploaded can be specified as:
 \itemize{
-\item A vector of local filenames. All common image file formats are supported.
+\item A vector of local filenames. JPG, PNG and GIF file formats are supported.
 \item A vector of publicly accessible URLs.
 \item A raw vector, or a list of raw vectors, holding the binary contents of the image files.
 }
 
-Uploaded images can be \emph{tagged}, which set the target labels for each image. To specify a single tag per image, set \code{tags} to be a vector. For multiple tags per image, \code{tags} should be a list, with each component being the vector of tags for the corresponding image. If \code{tags} has length 1, it is recycled to the length of \code{images} as a convenience feature for giving multiple images the same tag.
+Uploaded images can also have \emph{tags} added (for a classification project) or \emph{regions} (for an object detection project). Classification tags can be specified in the following ways:
+\itemize{
+\item As a single character string. In this case, the tag will be applied to all image IDs.
+\item As a vector of strings, with length equal to the length of \code{image_ids}. The tags will be applied to the images in order.
+\item As a \emph{list} of vectors of strings, with the length of the list equal to the length of \code{image_ids}. Each vector in the list contains the tags to be assigned to the corresponding image.
+}
 
-Specifying regions is used for an object detection project. The \code{regions} argument should be a nested list, with each component specifying the regions for the corresponding image.
+Object detection projects also have tags, but they are specified as part of the \code{regions} argument. The regions to add should be specified as a list of data frames, with one data frame per image. Each data frame should have one row per region, and the following columns:
+\itemize{
+\item \code{left}, \code{top}, \code{width}, \code{height}: the location and dimensions of the region bounding box, normalised to be between 0 and 1.
+\item \code{tag}: the name of the tag to associate with the region.
+Any other columns in the data frame will be ignored.
+}
 
 Note that once uploaded, images are identified only by their ID; there is no general link back to the source filename or URL.
 }
 \seealso{
-\code{\link{add_image_tags}} and \code{\link{add_image_regions}} to add tags and regions to images if not done at upload time
+\code{\link{add_image_tags}} and \code{\link{add_image_regions}} to add tags and regions to images, if not done at upload time
 
 \code{\link{add_tags}}, \code{\link{list_tags}}, \code{\link{remove_tags}}
 

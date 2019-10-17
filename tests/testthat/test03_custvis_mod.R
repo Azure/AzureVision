@@ -24,7 +24,7 @@ test_that("Model training works",
     expect_is(endp, c("customvision_training_endpoint", "cognitive_endpoint"))
     expect_true(is_empty(list_projects(endp)))
 
-    proj <- create_classification_project(endp, projname, export_target="basic")
+    proj <- create_classification_project(endp, projname, export_target="standard")
     expect_is(proj, "classification_project")
 
     img_ids <- add_images(proj, c(cans, cartons), tags)

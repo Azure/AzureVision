@@ -12,16 +12,21 @@
 #' @param ... Arguments passed to lower-level functions.
 #' @details
 #' The images to be uploaded can be specified as:
-#' - A vector of local filenames. All common image file formats are supported.
+#' - A vector of local filenames. JPG, PNG and GIF file formats are supported.
 #' - A vector of publicly accessible URLs.
 #' - A raw vector, or a list of raw vectors, holding the binary contents of the image files.
 #'
-#' Uploaded images can be _tagged_, which set the target labels for each image. To specify a single tag per image, set `tags` to be a vector. For multiple tags per image, `tags` should be a list, with each component being the vector of tags for the corresponding image. If `tags` has length 1, it is recycled to the length of `images` as a convenience feature for giving multiple images the same tag.
+#' Uploaded images can also have _tags_ added (for a classification project) or _regions_ (for an object detection project). Classification tags can be specified in the following ways:
+#' - As a single character string. In this case, the tag will be applied to all image IDs.
+#' - As a vector of strings, with length equal to the length of `image_ids`. The tags will be applied to the images in order.
+#' - As a _list_ of vectors of strings, with the length of the list equal to the length of `image_ids`. Each vector in the list contains the tags to be assigned to the corresponding image.
 #'
-#' Specifying regions is used for an object detection project. The `regions` argument should be a nested list, with each component specifying the regions for the corresponding image.
+#' Object detection projects also have tags, but they are specified as part of the `regions` argument. The regions to add should be specified as a list of data frames, with one data frame per image. Each data frame should have one row per region, and the following columns:
+#' - `left`, `top`, `width`, `height`: the location and dimensions of the region bounding box, normalised to be between 0 and 1.
+#' - `tag`: the name of the tag to associate with the region.
+#' Any other columns in the data frame will be ignored.
 #'
 #' Note that once uploaded, images are identified only by their ID; there is no general link back to the source filename or URL.
-#'
 #' @return
 #' For `add_images`, the vector of IDs of the uploaded images.
 #'
@@ -29,7 +34,7 @@
 #'
 #' For `remove_images`, NULL on successful removal.
 #' @seealso
-#' [`add_image_tags`] and [`add_image_regions`] to add tags and regions to images if not done at upload time
+#' [`add_image_tags`] and [`add_image_regions`] to add tags and regions to images, if not done at upload time
 #'
 #' [`add_tags`], [`list_tags`], [`remove_tags`]
 #'
@@ -89,7 +94,6 @@ add_images_internal <- function(project, images)
 
     img_ids <- sapply(lst, function(x) x$id)
 }
-
 
 
 #' @rdname customvision_images
@@ -170,6 +174,8 @@ remove_images <- function(project, image_ids=list_images(project, "untagged", as
 #' @param iteration The iteration ID (roughly, which model generation to use). Defaults to the latest iteration.
 #' @details
 #' Images in a Custom Vision project are stored in Azure Storage. This function simply gets the URL for the uploaded image and displays it in your browser.
+#' @seealso
+#' [`list_images`]
 #' @export
 browse_image <- function(project, img_id, which=c("resized", "original", "thumbnail"), iteration=NULL)
 {

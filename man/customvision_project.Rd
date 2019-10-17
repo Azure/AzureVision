@@ -11,19 +11,19 @@
 \title{Create, retrieve, update and delete Azure Custom Vision projects}
 \usage{
 create_classification_project(endpoint, name, domain = "general",
-  export_target = c("none", "basic", "vaidk"), multiple_tags = FALSE,
-  description = NULL)
+  export_target = c("none", "standard", "vaidk"),
+  multiple_tags = FALSE, description = NULL)
 
 create_object_detection_project(endpoint, name, domain = "general",
-  export_target = c("none", "basic", "vaidk"), description = NULL)
+  export_target = c("none", "standard", "vaidk"), description = NULL)
 
 list_projects(endpoint)
 
 get_project(endpoint, name = NULL, id = NULL)
 
 update_project(endpoint, name = NULL, id = NULL, domain = "general",
-  export_target = c("none", "basic", "vaidk"), multiple_tags = FALSE,
-  description = NULL)
+  export_target = c("none", "standard", "vaidk"),
+  multiple_tags = FALSE, description = NULL)
 
 delete_project(object, ...)
 }
@@ -53,7 +53,7 @@ Create, retrieve, update and delete Azure Custom Vision projects
 \details{
 A Custom Vision project contains the metadata for a model: its intended purpose (classification vs object detection), the domain, the set of training images, and so on. Once you have created a project, you upload images to it, and train models based on those images. A trained model can then be published as a predictive service, or exported for standalone use.
 
-By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting \code{export_target="basic"} enables exporting to the following formats:
+By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting \code{export_target="standard"} enables exporting to the following formats:
 \itemize{
 \item "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
 \item "coreml": CoreML, for iOS 11 devices

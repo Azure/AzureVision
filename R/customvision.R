@@ -18,7 +18,7 @@ print.customvision_project <- function(x, ...)
     export_type <- if(!compact)
         "none"
     else if(is_empty(x$project$settings$targetExportPlatforms))
-        "basic"
+        "standard"
     else "Vision AI Dev Kit"
     cat("  Export target:", export_type, "\n")
 
@@ -44,7 +44,7 @@ print.customvision_project <- function(x, ...)
 #' @details
 #' A Custom Vision project contains the metadata for a model: its intended purpose (classification vs object detection), the domain, the set of training images, and so on. Once you have created a project, you upload images to it, and train models based on those images. A trained model can then be published as a predictive service, or exported for standalone use.
 #'
-#' By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting `export_target="basic"` enables exporting to the following formats:
+#' By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting `export_target="standard"` enables exporting to the following formats:
 #' - "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
 #' - "coreml": CoreML, for iOS 11 devices
 #' - "tensorflow": TensorFlow
@@ -60,7 +60,7 @@ print.customvision_project <- function(x, ...)
 #' @export
 create_classification_project <- function(endpoint, name,
                                           domain="general",
-                                          export_target=c("none", "basic", "vaidk"),
+                                          export_target=c("none", "standard", "vaidk"),
                                           multiple_tags=FALSE,
                                           description=NULL)
 {
@@ -74,7 +74,7 @@ create_classification_project <- function(endpoint, name,
 #' @export
 create_object_detection_project <- function(endpoint, name,
                                             domain="general",
-                                            export_target=c("none", "basic", "vaidk"),
+                                            export_target=c("none", "standard", "vaidk"),
                                             description=NULL)
 {
     export_target <- match.arg(export_target)
@@ -85,7 +85,7 @@ create_object_detection_project <- function(endpoint, name,
 
 create_project <- function(endpoint, name,
                            domain="general",
-                           export_target=c("none", "basic", "vaidk"),
+                           export_target=c("none", "standard", "vaidk"),
                            multiple_tags=FALSE,
                            description=NULL,
                            purpose=c("classification", "object_detection"))
@@ -140,7 +140,7 @@ get_project <- function(endpoint, name=NULL, id=NULL)
 #' @export
 update_project <- function(endpoint, name=NULL, id=NULL,
                            domain="general",
-                           export_target=c("none", "basic", "vaidk"),
+                           export_target=c("none", "standard", "vaidk"),
                            multiple_tags=FALSE,
                            description=NULL)
 {
@@ -167,7 +167,7 @@ update_project <- function(endpoint, name=NULL, id=NULL,
     else if(!is_compact_domain(project$settings$domainId))
         "none"
     else if(is_empty(project$settings$targetExportPlatforms))
-        "basic"
+        "standard"
     else "vaidk"
 
     if(newtarget || newdomain)

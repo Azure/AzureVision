@@ -3,11 +3,14 @@
 \name{add_image_tags}
 \alias{add_image_tags}
 \alias{customvision_image_tags}
+\alias{add_image_tags.classification_project}
 \alias{remove_image_tags}
 \title{Tag and untag images uploaded to a project}
 \usage{
-add_image_tags(project, image_ids = list_images(project, "untagged", as =
-  "ids"), tags)
+add_image_tags(project, image_ids, tags)
+
+\method{add_image_tags}{classification_project}(project,
+  image_ids = list_images(project, "untagged"), tags)
 
 remove_image_tags(project, image_ids = list_images(project, "tagged", as
   = "ids"), tags = list_tags(project, as = "ids"))
@@ -32,9 +35,11 @@ Tags can be specified in the following ways:
 \itemize{
 \item As a single character string. In this case, the tag will be applied to all image IDs.
 \item As a vector of strings, with length equal to the length of \code{image_ids}. The tags will be applied to the images in order.
-\item As a list of vectors of strings, with the length of the list equal to the length of \code{image_ids}. Each vector in the list contains the tags to be assigned to the corresponding image.
+\item As a \emph{list} of vectors of strings, with the length of the list equal to the length of \code{image_ids}. Each vector in the list contains the tags to be assigned to the corresponding image.
 }
 }
 \seealso{
-\code{\link{add_images}}, \code{\link{list_tags}}
+\code{\link{add_images}}, \code{\link{add_tags}}
+
+\code{\link{add_image_regions}} for object detection projects
 }

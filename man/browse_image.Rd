@@ -22,3 +22,6 @@ View an image uploaded to a Custom Vision project
 \details{
 Images in a Custom Vision project are stored in Azure Storage. This function simply gets the URL for the uploaded image and displays it in your browser.
 }
+\seealso{
+\code{\link{list_images}}
+}

@@ -58,6 +58,8 @@ Create, retrieve and delete a model iteration
 \details{
 Training a Custom Vision model results in a \emph{model iteration}. Each iteration is based on the current set of images uploaded to the endpoint. Successive model iterations trained on different image sets do not overwrite previous ones.
 
+You must have at least 5 images per tag for a classification project, and 15 images per tag for an object detection project, before you can train a model.
+
 By default, AzureVision will use the latest model iteration for actions such as prediction, showing performance statistics, and so on. You can list the model iterations with \code{list_models}, and retrieve a specific iteration by passing the iteration ID to \code{get_model}.
 }
 \seealso{

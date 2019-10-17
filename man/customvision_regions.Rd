@@ -2,6 +2,7 @@
 % Please edit documentation in R/customvision_regions.R
 \name{add_image_regions}
 \alias{add_image_regions}
+\alias{customvision_regions}
 \alias{remove_image_regions}
 \alias{identify_regions}
 \title{Add and remove regions from images}
@@ -15,7 +16,7 @@ identify_regions(project, image)
 \arguments{
 \item{project}{A Custom Vision object detection project.}
 
-\item{image_ids}{For \code{add_image_regions} and \code{remove_image_regions}, the IDs of the images for which to add or remove images.}
+\item{image_ids}{For \code{add_image_regions} and \code{remove_image_regions}, the IDs of the images for which to add or remove regions.}
 
 \item{regions}{For \code{add_image_regions}, the regions to add. See 'Details' below.}
 
@@ -27,15 +28,24 @@ identify_regions(project, image)
 For \code{add_image_regions}, a data frame containing the details on the added regions.
 
 For \code{remove_image_regions}, the value of \code{image_ids} invisibly, if this argument was provided; NULL otherwise.
+
+For \code{identify_regions}, a list with the following components: \code{projectId}, the ID of the project; \code{imageId}, the ID of the image; and \code{proposals}, a data frame containing the coordinates of each identified region along with a confidence score.
 }
 \description{
 Add and remove regions from images
 }
 \details{
-The regions to add should be specified as a list of data frames, with one list component per image. Each data frame should have one row per region to add, and the following columns:
+\code{add_image_regions} and \code{remove_image_regions} let you specify the regions in an image that contain an object. You can use \code{identify_regions} to have Custom Vision try to guess the regions for an image.
+
+The regions to add should be specified as a list of data frames, with one data frame per image. Each data frame should have one row per region, and the following columns:
 \itemize{
-\item \code{left}, \code{top}, \code{width}, \code{height}: the location and dimensions of the region bounding box.
-\item Either \code{tag}, the name of the tag to associate with the region, or \code{tag_id}, the GUID of the tag. All tags must have previously been added to the project, either via \code{\link{add_tags}} or \code{\link{add_image_tags}}.
+\item \code{left}, \code{top}, \code{width}, \code{height}: the location and dimensions of the region bounding box, normalised to be between 0 and 1.
+\item \code{tag}: the name of the tag to associate with the region.
 Any other columns in the data frame will be ignored.
 }
+}
+\seealso{
+\code{\link{add_images}}, \code{\link{add_tags}}
+
+\code{\link{add_image_tags}} for classification projects
 }
