@@ -204,7 +204,7 @@ publish_model <- function(model, name, prediction_resource)
 
     op <- file.path("iterations", model$id, "publish")
     options <- list(publishName=name, predictionId=prediction_resource)
-    do_training_op(model$project, op, options=options, http_verb="POST", http_status_handler="pass")
+    do_training_op(model$project, op, options=options, http_verb="POST")
 }
 
 
