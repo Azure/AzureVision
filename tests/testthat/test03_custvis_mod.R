@@ -27,6 +27,7 @@ test_that("Model training works",
     proj <- create_classification_project(endp, projname, export_target="standard")
     expect_is(proj, "classification_project")
 
+    Sys.sleep(2)
     img_ids <- add_images(proj, c(cans, cartons), tags)
     expect_type(img_ids, "character")
 
@@ -37,6 +38,7 @@ test_that("Model training works",
     img_tags <- do.call(rbind.data.frame, img_df$tags)$tagName
     expect_identical(img_tags, tags)
 
+    Sys.sleep(2)
     mod <- train_model(proj)
     expect_is(mod, "customvision_model")
 

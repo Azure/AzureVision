@@ -1,4 +1,4 @@
-context("Custom Vision project and image creation")
+context("Custom Vision object detection")
 
 custvis_url <- Sys.getenv("AZ_TEST_CUSTOMVISION_URL")
 custvis_key <- Sys.getenv("AZ_TEST_CUSTOMVISION_KEY")
