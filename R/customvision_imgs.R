@@ -166,31 +166,41 @@ remove_images <- function(project, image_ids=list_images(project, "untagged", as
 }
 
 
-#' View an image uploaded to a Custom Vision project
+#' View images uploaded to a Custom Vision project
 #'
 #' @param project A Custom Vision project.
-#' @param img_id The ID of the image. You can use [`list_images`] to get the image IDs for this project.
+#' @param img_ids The IDs of the images to view. You can use [`list_images`] to get the image IDs for this project.
 #' @param which Which image to view: the resized version used for training (the default), the original uploaded image, or the thumbnail.
+#' @param max_images The maximum number of images to display.
 #' @param iteration The iteration ID (roughly, which model generation to use). Defaults to the latest iteration.
 #' @details
-#' Images in a Custom Vision project are stored in Azure Storage. This function simply gets the URL for the uploaded image and displays it in your browser.
+#' Images in a Custom Vision project are stored in Azure Storage. This function gets the URLs for the uploaded images and displays them in your browser.
 #' @seealso
 #' [`list_images`]
 #' @export
-browse_image <- function(project, img_id, which=c("resized", "original", "thumbnail"), iteration=NULL)
+browse_images <- function(project, img_ids, which=c("resized", "original", "thumbnail"), max_images=20,
+                          iteration=NULL)
 {
+    if(length(img_ids) > max_images)
+    {
+        warning("Only the first ", max_images, " images displayed", call.=FALSE)
+        img_ids <- img_ids[seq_len(max_images)]
+    }
+
     opts <- list(
-        imageIds=img_id,
+        imageIds=paste0(img_ids, collapse=","),
         iterationId=iteration
     )
-    res <- do_training_op(project, "images/id", options=opts)
+    res <- do_training_op(project, "images/id", options=opts, simplifyDataFrame=TRUE)
 
-    img_url <- switch(match.arg(which),
-        resized=res[[1]]$resizedImageUri,
-        original=res[[1]]$originalImageUri,
-        thumbnail=res[[1]]$thumbnailUri
+    img_urls <- switch(match.arg(which),
+        resized=res$resizedImageUri,
+        original=res$originalImageUri,
+        thumbnail=res$thumbnailUri
     )
-    httr::BROWSE(img_url)
+
+    lapply(img_urls, httr::BROWSE)
+    invisible(NULL)
 }
 
 
