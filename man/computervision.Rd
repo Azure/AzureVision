@@ -5,7 +5,6 @@
 \alias{computervision}
 \alias{describe}
 \alias{detect_objects}
-\alias{detect_faces}
 \alias{area_of_interest}
 \alias{tag}
 \alias{categorize}
@@ -21,8 +20,6 @@ describe(endpoint, image, language = "en", ...)
 
 detect_objects(endpoint, image, ...)
 
-detect_faces(endpoint, image, ...)
-
 area_of_interest(endpoint, image, ...)
 
 tag(endpoint, image, language = "en", ...)
@@ -35,7 +32,7 @@ read_text(endpoint, image, detect_orientation = TRUE, language = "en",
 list_domains(endpoint, ...)
 
 make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
-  outfile = NULL)
+  outfile)
 }
 \arguments{
 \item{endpoint}{A computer vision endpoint.}
@@ -44,7 +41,7 @@ make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
 
 \item{domain}{For \code{analyze}, an optional domain-specific model to use to analyze the image. Can be "celebrities" or "landmarks".}
 
-\item{feature_types}{For \code{analyze}, an optional character vector of more detailed features to return. This can be one or more of: "categories", "tags", "description", "faces", "imagetype", "color", "adult", "brands" and "objects".}
+\item{feature_types}{For \code{analyze}, an optional character vector of more detailed features to return. This can be one or more of: "categories", "tags", "description", "faces", "imagetype", "color", "adult", "brands" and "objects". If not supplied, defaults to "categories".}
 
 \item{language}{A 2-character code indicating the language to use for tags, feature labels and descriptions. The default is \code{en}, for English.}
 
@@ -56,10 +53,24 @@ make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
 
 \item{smart_crop}{For \code{make_thumbnail}, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratios of the original image and the thumbnail don't match.}
 
-\item{outfile}{For \code{make_thumbnail}, an optional filename for the generated thumbnail. If not provided, the thumbnail is returned as a raw vector.}
+\item{outfile}{For \code{make_thumbnail}, the filename for the generated thumbnail. Alternatively, if this is NULL the thumbnail is returned as a raw vector.}
 }
 \value{
-\code{make_thumbnail} returns a raw vector holding the contents of the thumbnail, if the \code{outfile} argument is NULL. \code{tag} and \code{categorize} return a data frame. The others return an object of class \code{computervision_response}, which is a simple wrapper class for the response from the API endpoint to allow pretty-printing.
+\code{analyze} returns a list containing the results of the analysis. The components will vary depending on the domain and feature types requested.
+
+\code{describe} returns a character string.
+
+\code{detect_objects}  returns a dataframe giving the locations and types of the detected objects.
+
+\code{area_of_interest} returns a length-4 numeric vector, containing the top-left coordinates of the area of interest and its width and height.
+
+\code{tag} and \code{categorize} return a data frame of tag and category information, respectively.
+
+\code{read_text} returns the extracted text as a list with one component per region that contains text. Each component is a vector of character strings.
+
+\code{list_domains} returns a character vector of domain names.
+
+\code{make_thumbnail} returns a raw vector holding the contents of the thumbnail, if the \code{outfile} argument is NULL. Otherwise, the thumbnail is saved into \code{outfile}.
 }
 \description{
 Interface to Azure Computer Vision API
@@ -69,9 +80,7 @@ Interface to Azure Computer Vision API
 
 \code{describe} returns a short text description of the image.
 
-\code{detect_objects} detects objects in the image. It returns a list of bounding boxes indicating the locations of the detected objects.
-
-\code{detect_faces} detects the presence or absence of a human face in the image.
+\code{detect_objects} detects objects in the image.
 
 \code{area_of_interest} attempts to find the "interesting" part of an image, meaning the most likely location of the image's subject.
 

@@ -3,21 +3,19 @@
 #' @param endpoint A computer vision endpoint.
 #' @param image An image to be sent to the endpoint. This can be either a filename, a publicly accessible URL, or a raw vector holding the file contents.
 #' @param domain For `analyze`, an optional domain-specific model to use to analyze the image. Can be "celebrities" or "landmarks".
-#' @param feature_types For `analyze`, an optional character vector of more detailed features to return. This can be one or more of: "categories", "tags", "description", "faces", "imagetype", "color", "adult", "brands" and "objects".
+#' @param feature_types For `analyze`, an optional character vector of more detailed features to return. This can be one or more of: "categories", "tags", "description", "faces", "imagetype", "color", "adult", "brands" and "objects". If not supplied, defaults to "categories".
 #' @param language A 2-character code indicating the language to use for tags, feature labels and descriptions. The default is `en`, for English.
 #' @param detect_orientation For `read_text`, whether to automatically determine the image's orientation.
 #' @param width,height For `make_thumbnail`, the dimensions for the returned thumbnail.
 #' @param smart_crop For `make_thumbnail`, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratios of the original image and the thumbnail don't match.
-#' @param outfile For `make_thumbnail`, an optional filename for the generated thumbnail. If not provided, the thumbnail is returned as a raw vector.
+#' @param outfile For `make_thumbnail`, the filename for the generated thumbnail. Alternatively, if this is NULL the thumbnail is returned as a raw vector.
 #' @param ... Arguments passed to lower-level functions, and ultimately to `call_cognitive_endpoint`.
 #' @details
 #' `analyze` extracts visual features from the image. To obtain more detailed features, specify the `domain` and/or `feature_types` arguments as appropriate.
 #'
-#' `describe` returns a short text description of the image.
+#' `describe` attempts to provide a text description of the image.
 #'
-#' `detect_objects` detects objects in the image. It returns a list of bounding boxes indicating the locations of the detected objects.
-#'
-#' `detect_faces` detects the presence or absence of a human face in the image.
+#' `detect_objects` detects objects in the image.
 #'
 #' `area_of_interest` attempts to find the "interesting" part of an image, meaning the most likely location of the image's subject.
 #'
@@ -31,7 +29,22 @@
 #'
 #' `make_thumbnail` generates a thumbnail of the image, with the specified dimensions.
 #' @return
-#' `make_thumbnail` returns a raw vector holding the contents of the thumbnail, if the `outfile` argument is NULL. `tag` and `categorize` return a data frame. The others return an object of class `computervision_response`, which is a simple wrapper class for the response from the API endpoint to allow pretty-printing.
+#' `analyze` returns a list containing the results of the analysis. The components will vary depending on the domain and feature types requested.
+#'
+#' `describe` returns a list with two components: `tags`, a vector of text labels; and `captions`, a data frame of descriptive sentences.
+#'
+#' `detect_objects`  returns a dataframe giving the locations and types of the detected objects.
+#'
+#' `area_of_interest` returns a length-4 numeric vector, containing the top-left coordinates of the area of interest and its width and height.
+#'
+#' `tag` and `categorize` return a data frame of tag and category information, respectively.
+#'
+#' `read_text` returns the extracted text as a list with one component per region that contains text. Each component is a vector of character strings.
+#'
+#' `list_domains` returns a character vector of domain names.
+#'
+#' `make_thumbnail` returns a raw vector holding the contents of the thumbnail, if the `outfile` argument is NULL. Otherwise, the thumbnail is saved into `outfile`.
+#'
 #' @seealso
 #' [`computervision_endpoint`], [`AzureCognitive::call_cognitive_endpoint`]
 #'
@@ -43,11 +56,13 @@ analyze <- function(endpoint, image, domain=NULL, feature_types=NULL, language="
 {
     body <- image_to_body(image)
     if(!is_empty(feature_types))
-        feature_types <- paste0(feature_types, collapse="")
-    options <- list(detail=domain, language=language, visualFeatures=feature_types)
+        feature_types <- paste0(feature_types, collapse=",")
+    options <- list(details=domain, language=language, visualFeatures=feature_types)
 
-    res <- call_cognitive_endpoint(endpoint, "analyze", body=body, options=options, ..., http_verb="POST")
-    as_vision_response(res)
+    res <- call_cognitive_endpoint(endpoint, "analyze", body=body, options=options, ..., http_verb="POST",
+                                   simplifyVector=TRUE)
+
+    res[!(names(res) %in% c("requestId", "metadata"))]
 }
 
 
@@ -57,8 +72,9 @@ describe <- function(endpoint, image, language="en", ...)
 {
     body <- image_to_body(image)
     options <- list(language=language)
-    res <- call_cognitive_endpoint(endpoint, "describe", body=body, options=options, ..., http_verb="POST")
-    as_vision_response(res)
+    res <- call_cognitive_endpoint(endpoint, "describe", body=body, options=options, ..., http_verb="POST",
+                                   simplifyVector=TRUE)
+    res$description
 }
 
 
@@ -67,19 +83,8 @@ describe <- function(endpoint, image, language="en", ...)
 detect_objects <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
-    res <- call_cognitive_endpoint(endpoint, "detect", body=body, ..., http_verb="POST")
-    as_vision_response(res)
-}
-
-
-#' @rdname computervision
-#' @export
-detect_faces <- function(endpoint, image, ...)
-{
-    body <- image_to_body(image)
-    res <- call_cognitive_endpoint(endpoint, "analyze", body=body, options=list(visualFeatures="faces"), ...,
-                                   http_verb="POST")
-    as_vision_response(res)
+    res <- call_cognitive_endpoint(endpoint, "detect", body=body, ..., http_verb="POST", simplifyVector=TRUE)
+    res$objects
 }
 
 
@@ -88,8 +93,8 @@ detect_faces <- function(endpoint, image, ...)
 area_of_interest <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
-    res <- call_cognitive_endpoint(endpoint, "areaOfInterest", body=body, ..., http_verb="POST")
-    as_vision_response(res)
+    res <- call_cognitive_endpoint(endpoint, "areaOfInterest", body=body, ..., http_verb="POST", simplifyVector=TRUE)
+    unlist(res$areaOfInterest)
 }
 
 
@@ -99,8 +104,9 @@ tag <- function(endpoint, image, language="en", ...)
 {
     body <- image_to_body(image)
     res <- call_cognitive_endpoint(endpoint, "tag", body=body, options=list(language=language), ..., http_verb="POST")
-    tags <- as_vision_response(res)$tags
-    do.call(rbind.data.frame, c(lapply(tags, function(x)
+
+    # hint not always present, so need to construct data frame manually
+    do.call(rbind.data.frame, c(lapply(res$tags, function(x)
     {
         if(is.null(x$hint))
             x$hint <- NA_character_
@@ -115,9 +121,8 @@ categorize <- function(endpoint, image, ...)
 {
     body <- image_to_body(image)
     res <- call_cognitive_endpoint(endpoint, "analyze", body=body, options=list(visualFeatures="categories"), ...,
-                                   http_verb="POST")
-    cats <- as_vision_response(res)$categories
-    do.call(rbind.data.frame, c(cats, stringsAsFactors=FALSE))
+                                   http_verb="POST", simplifyVector=TRUE)
+    res$categories
 }
 
 
@@ -129,7 +134,15 @@ read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", .
     res <- call_cognitive_endpoint(endpoint, "ocr", body=body,
                                    options=list(detectOrientation=detect_orientation, language=language), ...,
                                    http_verb="POST")
-    as_vision_response(res)
+
+    lapply(res$regions, function(region)
+    {
+        sapply(region$lines, function(line)
+        {
+            w <- sapply(line$words, `[[`, "text")
+            paste(w, collapse=" ")
+        })
+    })
 }
 
 
@@ -137,14 +150,14 @@ read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", .
 #' @export
 list_domains <- function(endpoint, ...)
 {
-    res <- call_cognitive_endpoint(endpoint, "models", ...)
-    as_vision_response(res)
+    res <- call_cognitive_endpoint(endpoint, "models", ..., simplifyVector=TRUE)
+    res$models$name
 }
 
 
 #' @rdname computervision
 #' @export
-make_thumbnail <- function(endpoint, image, width, height, smart_crop=TRUE, ..., outfile=NULL)
+make_thumbnail <- function(endpoint, image, width, height, smart_crop=TRUE, ..., outfile)
 {
     body <- image_to_body(image)
     res <- call_cognitive_endpoint(endpoint, "generateThumbnail", body=body,
@@ -165,21 +178,4 @@ image_to_body <- function(image)
     else if(is_any_uri(image))
         list(url=image)
     else stop("Could not find image", call.=FALSE)
-}
-
-
-as_vision_response <- function(res)
-{
-    structure(res, class="computervision_response")
-}
-
-
-print.computervision_response <- function(x, ...)
-{
-    nms <- names(x)
-    meta_nms <- c("requestId", "metadata")
-    meta <- nms %in% meta_nms
-
-    print(x[!meta])
-    invisible(x)
 }
