@@ -28,7 +28,7 @@ These are functions to create service-specific endpoint objects. They handle dif
 }
 \examples{
 
-computervision_("https://myaccount.cognitiveservices.azure.com", key="key")
+computervision_endpoint("https://myaccount.cognitiveservices.azure.com", key="key")
 
 customvision_training_endpoint("https://westus.api.cognitive.microsoft.com", key="key")
 

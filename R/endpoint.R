@@ -11,7 +11,7 @@
 #' @rdname endpoint
 #' @examples
 #'
-#' computervision_("https://myaccount.cognitiveservices.azure.com", key="key")
+#' computervision_endpoint("https://myaccount.cognitiveservices.azure.com", key="key")
 #'
 #' customvision_training_endpoint("https://westus.api.cognitive.microsoft.com", key="key")
 #'
