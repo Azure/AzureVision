@@ -26,6 +26,15 @@ Endpoint objects for computer vision services
 \details{
 These are functions to create service-specific endpoint objects. They handle differences between the services in how they perform authentication, endpoint paths, and so on.
 }
+\examples{
+
+computervision_("https://myaccount.cognitiveservices.azure.com", key="key")
+
+customvision_training_endpoint("https://westus.api.cognitive.microsoft.com", key="key")
+
+customvision_prediction_endpoint("https://westus.api.cognitive.microsoft.com", key="key")
+
+}
 \seealso{
 \code{\link{cognitive_endpoint}}, \code{\link{call_cognitive_endpoint}}
 }

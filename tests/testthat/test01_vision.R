@@ -64,7 +64,7 @@ test_that("Computer Vision endpoint works with URL",
     expect_is(res_text, "list")
     expect_type(res_text[[1]], "character")
 
-    res_thumb <- make_thumbnail(endp, img, width=50, height=50, outfile=NULL)
+    res_thumb <- make_thumbnail(endp, img, outfile=NULL, width=50, height=50)
     expect_type(res_thumb, "raw")
 })
 

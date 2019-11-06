@@ -9,6 +9,7 @@ Description: An interface to the Azure Computer Vision and Custom Vision client 
 URL: https://github.com/Azure/AzureVision https://github.com/Azure/AzureR
 BugReports: https://github.com/Azure/AzureVision/issues
 License: MIT + file LICENSE
+VignetteBuilder: knitr
 Depends: 
     R (>= 3.3)
 Imports:
@@ -17,6 +18,7 @@ Imports:
     httr,
     utils
 Suggests:
+    knitr,
     AzureAuth,
     testthat
 Roxygen: list(markdown=TRUE)

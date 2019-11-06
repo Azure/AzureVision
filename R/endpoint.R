@@ -9,6 +9,14 @@
 #' @seealso
 #' [`cognitive_endpoint`], [`call_cognitive_endpoint`]
 #' @rdname endpoint
+#' @examples
+#'
+#' computervision_("https://myaccount.cognitiveservices.azure.com", key="key")
+#'
+#' customvision_training_endpoint("https://westus.api.cognitive.microsoft.com", key="key")
+#'
+#' customvision_prediction_endpoint("https://westus.api.cognitive.microsoft.com", key="key")
+#'
 #' @export
 computervision_endpoint <- function(url, ...)
 {

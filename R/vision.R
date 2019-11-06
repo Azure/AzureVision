@@ -49,6 +49,34 @@
 #' [`computervision_endpoint`], [`AzureCognitive::call_cognitive_endpoint`]
 #'
 #' [Computer Vision documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/Computer-vision/Home)
+#' @examples
+#' \dontrun{
+#'
+#' vis <- computervision_endpoint(
+#'     url="https://accountname.cognitiveservices.azure.com/",
+#'     key="account_key"
+#' )
+#'
+#' list_domains(vis)
+#'
+#' # analyze a local file
+#' analyze(vis, "image.jpg")
+#' # picture on the Internet
+#' analyze(vis, "https://example.com/image.jpg")
+#' # as a raw vector
+#' analyze(vis, readBin("image.jpg", "raw", file.size("image.jpg")))
+#'
+#' # analyze has optional extras
+#' analyze(vis, "image.jpg", feature_types=c("faces", "objects"))
+#'
+#' describe(vis, "image.jpg")
+#' detect_objects(vis, "image.jpg")
+#' area_of_interest(vis, "image.jpg")
+#' tag(vis, "image.jpg")  # more reliable than analyze(*, feature_types="tags")
+#' categorize(vis, "image.jpg")
+#' read_text(vis, "scanned_text.jpg")
+#'
+#' }
 #' @aliases computervision
 #' @rdname computervision
 #' @export
@@ -111,7 +139,7 @@ tag <- function(endpoint, image, language="en", ...)
         if(is.null(x$hint))
             x$hint <- NA_character_
         x
-    }), stringsAsFactors=FALSE))
+    }), stringsAsFactors=FALSE, make.row.names=FALSE))
 }
 
 
@@ -157,14 +185,14 @@ list_domains <- function(endpoint, ...)
 
 #' @rdname computervision
 #' @export
-make_thumbnail <- function(endpoint, image, width, height, smart_crop=TRUE, ..., outfile)
+make_thumbnail <- function(endpoint, image, outfile, width=50, height=50, smart_crop=TRUE, ...)
 {
     body <- image_to_body(image)
     res <- call_cognitive_endpoint(endpoint, "generateThumbnail", body=body,
                                    options=list(width=width, height=height, smartCropping=smart_crop), ...,
                                    http_verb="POST")
     if(!is.null(outfile))
-        writeBin(outfile, res)
+        writeBin(res, outfile)
     else res
 }
 

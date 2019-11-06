@@ -31,8 +31,8 @@ read_text(endpoint, image, detect_orientation = TRUE, language = "en",
 
 list_domains(endpoint, ...)
 
-make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
-  outfile)
+make_thumbnail(endpoint, image, outfile, width = 50, height = 50,
+  smart_crop = TRUE, ...)
 }
 \arguments{
 \item{endpoint}{A computer vision endpoint.}
@@ -49,16 +49,16 @@ make_thumbnail(endpoint, image, width, height, smart_crop = TRUE, ...,
 
 \item{detect_orientation}{For \code{read_text}, whether to automatically determine the image's orientation.}
 
+\item{outfile}{For \code{make_thumbnail}, the filename for the generated thumbnail. Alternatively, if this is NULL the thumbnail is returned as a raw vector.}
+
 \item{width, height}{For \code{make_thumbnail}, the dimensions for the returned thumbnail.}
 
 \item{smart_crop}{For \code{make_thumbnail}, whether to automatically determine the best location to crop for the thumbnail. Useful when the aspect ratios of the original image and the thumbnail don't match.}
-
-\item{outfile}{For \code{make_thumbnail}, the filename for the generated thumbnail. Alternatively, if this is NULL the thumbnail is returned as a raw vector.}
 }
 \value{
 \code{analyze} returns a list containing the results of the analysis. The components will vary depending on the domain and feature types requested.
 
-\code{describe} returns a character string.
+\code{describe} returns a list with two components: \code{tags}, a vector of text labels; and \code{captions}, a data frame of descriptive sentences.
 
 \code{detect_objects}  returns a dataframe giving the locations and types of the detected objects.
 
@@ -78,7 +78,7 @@ Interface to Azure Computer Vision API
 \details{
 \code{analyze} extracts visual features from the image. To obtain more detailed features, specify the \code{domain} and/or \code{feature_types} arguments as appropriate.
 
-\code{describe} returns a short text description of the image.
+\code{describe} attempts to provide a text description of the image.
 
 \code{detect_objects} detects objects in the image.
 
@@ -93,6 +93,35 @@ Interface to Azure Computer Vision API
 \code{list_domains} returns the predefined domain-specific models that can be queried by \code{analyze} for deeper analysis. Not to be confused with the domains available for training models with the Custom Vision API.
 
 \code{make_thumbnail} generates a thumbnail of the image, with the specified dimensions.
+}
+\examples{
+\dontrun{
+
+vis <- computervision_endpoint(
+    url="https://accountname.cognitiveservices.azure.com/",
+    key="account_key"
+)
+
+list_domains(vis)
+
+# analyze a local file
+analyze(vis, "image.jpg")
+# picture on the Internet
+analyze(vis, "https://example.com/image.jpg")
+# as a raw vector
+analyze(vis, readBin("image.jpg", "raw", file.size("image.jpg")))
+
+# analyze has optional extras
+analyze(vis, "image.jpg", feature_types=c("faces", "objects"))
+
+describe(vis, "image.jpg")
+detect_objects(vis, "image.jpg")
+area_of_interest(vis, "image.jpg")
+tag(vis, "image.jpg")  # more reliable than analyze(*, feature_types="tags")
+categorize(vis, "image.jpg")
+read_text(vis, "scanned_text.jpg")
+
+}
 }
 \seealso{
 \code{\link{computervision_endpoint}}, \code{\link[AzureCognitive:call_cognitive_endpoint]{AzureCognitive::call_cognitive_endpoint}}
