@@ -119,8 +119,8 @@ create_project <- function(endpoint, name,
 #' @export
 list_projects <- function(endpoint)
 {
-    lst <- call_cognitive_endpoint(endpoint, "training/projects")
-    lapply(lst, make_customvision_project, endpoint=endpoint)
+    lst <- named_list(call_cognitive_endpoint(endpoint, "training/projects"))
+    sapply(lst, make_customvision_project, endpoint=endpoint, simplify=FALSE)
 }
 
 
