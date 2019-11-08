@@ -9,7 +9,7 @@
 \alias{tag}
 \alias{categorize}
 \alias{read_text}
-\alias{list_domains}
+\alias{list_computervision_domains}
 \alias{make_thumbnail}
 \title{Interface to Azure Computer Vision API}
 \usage{
@@ -29,7 +29,7 @@ categorize(endpoint, image, ...)
 read_text(endpoint, image, detect_orientation = TRUE, language = "en",
   ...)
 
-list_domains(endpoint, ...)
+list_computervision_domains(endpoint, ...)
 
 make_thumbnail(endpoint, image, outfile, width = 50, height = 50,
   smart_crop = TRUE, ...)
@@ -68,7 +68,7 @@ make_thumbnail(endpoint, image, outfile, width = 50, height = 50,
 
 \code{read_text} returns the extracted text as a list with one component per region that contains text. Each component is a vector of character strings.
 
-\code{list_domains} returns a character vector of domain names.
+\code{list_computervision_domains} returns a character vector of domain names.
 
 \code{make_thumbnail} returns a raw vector holding the contents of the thumbnail, if the \code{outfile} argument is NULL. Otherwise, the thumbnail is saved into \code{outfile}.
 }

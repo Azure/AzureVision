@@ -41,7 +41,7 @@
 #'
 #' `read_text` returns the extracted text as a list with one component per region that contains text. Each component is a vector of character strings.
 #'
-#' `list_domains` returns a character vector of domain names.
+#' `list_computervision_domains` returns a character vector of domain names.
 #'
 #' `make_thumbnail` returns a raw vector holding the contents of the thumbnail, if the `outfile` argument is NULL. Otherwise, the thumbnail is saved into `outfile`.
 #'
@@ -176,7 +176,7 @@ read_text <- function(endpoint, image, detect_orientation=TRUE, language="en", .
 
 #' @rdname computervision
 #' @export
-list_domains <- function(endpoint, ...)
+list_computervision_domains <- function(endpoint, ...)
 {
     res <- call_cognitive_endpoint(endpoint, "models", ..., simplifyVector=TRUE)
     res$models$name

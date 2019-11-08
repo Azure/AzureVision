@@ -28,7 +28,7 @@ AzureVision supports all the Computer Vision API calls:
 - `tag` returns a set of words that are relevant to the content of the image. Not to be confused with the `add_tags` or `add_image_tags` functions that are part of the Custom Vision API.
 - `categorize` attempts to place the image into a list of predefined categories.
 - `read_text` performs optical character recognition (OCR) on the image.
-- `list_domains` returns the predefined domain-specific models that can be queried by `analyze` for deeper analysis. Currently there are two domains: celebrities and landmarks.
+- `list_computervision_domains` returns the predefined domain-specific models that can be queried by `analyze` for deeper analysis. Currently there are two domains: celebrities and landmarks.
 - `make_thumbnail` generates a thumbnail of the image.
 
 ## Sample images
