@@ -150,7 +150,8 @@ delete_model.customvision_model <- function(object, confirm=TRUE, ...)
 #' @export
 show_model <- function(model)
 {
-    res <- do_training_op(model$project, file.path("iterations", model$id))
+    res <- do_training_op(model$project, file.path("iterations", model$id),
+        simplifyVector=TRUE, simplifyDataFrame=FALSE)
     res$created <- as_datetime(res$created)
     res$lastModified <- as_datetime(res$lastModified)
     res$trainedAt <- as_datetime(res$trainedAt)
