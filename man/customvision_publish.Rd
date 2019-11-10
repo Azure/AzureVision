@@ -4,6 +4,7 @@
 \alias{publish_model}
 \alias{unpublish_model}
 \alias{export_model}
+\alias{list_model_exports}
 \title{Publish, export and unpublish a Custom Vision model iteration}
 \usage{
 publish_model(model, name, prediction_resource)
@@ -11,6 +12,8 @@ publish_model(model, name, prediction_resource)
 unpublish_model(model, confirm = TRUE)
 
 export_model(model, format, download = TRUE, destfile = NULL)
+
+list_model_exports(model)
 }
 \arguments{
 \item{model}{A Custom Vision model iteration object.}
@@ -29,6 +32,8 @@ export_model(model, format, download = TRUE, destfile = NULL)
 }
 \value{
 \code{export_model} returns the URL of the exported file, invisibly if \code{download=TRUE}.
+
+\code{list_model_exports} returns a data frame detailing the formats the current model has been exported to, along with their download URLs.
 }
 \description{
 Publish, export and unpublish a Custom Vision model iteration
@@ -38,7 +43,7 @@ Publishing a model makes it available to clients as a predictive service. Export
 
 The \code{format} argument to \code{export_model} can be one of the following. Note that exporting a model requires that the project was created with support for it.
 \itemize{
-\item "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
+\item "onnx": ONNX 1.2
 \item "coreml": CoreML, for iOS 11 devices
 \item "tensorflow": TensorFlow
 \item "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)

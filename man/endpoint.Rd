@@ -6,14 +6,18 @@
 \alias{customvision_prediction_endpoint}
 \title{Endpoint objects for computer vision services}
 \usage{
-computervision_endpoint(url, ...)
+computervision_endpoint(url, key = NULL, aad_token = NULL, ...)
 
-customvision_training_endpoint(url, ...)
+customvision_training_endpoint(url, key = NULL, ...)
 
-customvision_prediction_endpoint(url, ...)
+customvision_prediction_endpoint(url, key = NULL, ...)
 }
 \arguments{
 \item{url}{The URL of the endpoint.}
+
+\item{key}{A subscription key. Can be single-service or multi-service.}
+
+\item{aad_token}{For the Computer Vision endpoint, an OAuth token object, of class \code{\link[AzureAuth:AzureToken]{AzureAuth::AzureToken}}. You can supply this as an alternative to a subscription key.}
 
 \item{...}{Other arguments to pass to \code{\link[AzureCognitive:cognitive_endpoint]{AzureCognitive::cognitive_endpoint}}.}
 }
@@ -24,7 +28,7 @@ An object inheriting from \code{cognitive_endpoint}. The subclass indicates the 
 Endpoint objects for computer vision services
 }
 \details{
-These are functions to create service-specific endpoint objects. They handle differences between the services in how they perform authentication, endpoint paths, and so on.
+These are functions to create service-specific endpoint objects. Computer Vision supports authentication via either a subscription key or Azure Active Directory (AAD) token; Custom Vision only supports subscription key. Note that there are \emph{two} kinds of Custom Vision endpoint, one for training and the other for prediction.
 }
 \examples{
 

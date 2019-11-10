@@ -4,6 +4,7 @@
 \alias{train_model}
 \alias{list_models}
 \alias{get_model}
+\alias{rename_model}
 \alias{delete_model}
 \alias{delete_model.customvision_project}
 \alias{delete_model.customvision_model}
@@ -16,6 +17,8 @@ train_model(project, training_method = c("quick", "advanced"),
 list_models(project, as = c("ids", "list"))
 
 get_model(project, iteration = NULL)
+
+rename_model(object, name, ...)
 
 delete_model(object, ...)
 
@@ -39,16 +42,18 @@ delete_model(object, ...)
 
 \item{as}{For \code{list_models}, the format in which to return results: as a named vector of model iteration IDs, or a list of model objects.}
 
-\item{iteration}{For \code{get_model} and \code{delete_model.customvision_project}, the iteration ID.}
+\item{iteration}{For \code{get_model} and \code{delete_model.customvision_project}, either the iteration name or ID.}
 
-\item{object}{For the \code{delete_model} methods, A Custom Vision project or model, as appropriate.}
+\item{object}{For the \code{delete_model} method, a Custom Vision project or model, as appropriate.}
 
 \item{...}{Arguments passed to lower-level functions.}
 
 \item{confirm}{For the \code{delete_model} methods, whether to ask for confirmation first.}
+
+\item{model}{A Custom Vision model.}
 }
 \value{
-For \code{train_model} and \code{get_model}, an object of class \code{customvision_model} which is a handle to the iteration.
+For \code{train_model}, \code{get_model} and \code{rename_model}, an object of class \code{customvision_model} which is a handle to the iteration.
 
 For \code{list_models}, based on the \code{as} argument: \code{as="ids"} returns a named vector of model iteration IDs, while \code{as="list"} returns a list of model objects.
 }

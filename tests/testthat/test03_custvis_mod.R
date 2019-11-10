@@ -70,7 +70,7 @@ test_that("Training endpoint prediction and export works",
 
     expect_error(predict(mod, c(cans, "../resources/can1.jpg")))
 
-    exp_url <- export_model(mod, "tensorflow", download=FALSE)
+    exp_url <- export_model(mod, "tensorflow lite", download=FALSE)
     expect_true(is_url(exp_url))
 })
 

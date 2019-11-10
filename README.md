@@ -35,7 +35,7 @@ describe(vis, bill_url)
 
 ## Custom Vision
 
-To communicate with the Custom Vision service, call the `customvision_endpoint` function with the service URL and key.
+To communicate with the Custom Vision service, call the `customvision_training_endpoint` function with the service URL and key.
 
 ----
 <p align="center"><a href="https://github.com/Azure/AzureR"><img src="https://github.com/Azure/AzureR/raw/master/images/logo2.png" width=800 /></a></p>

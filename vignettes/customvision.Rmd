@@ -1,0 +1,290 @@
+---
+title: "Creating and deploying a Custom Vision predictive service"
+author: Hong Ooi
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Custom Vision}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{utf8}
+---
+
+The basic idea behind Custom Vision is to take a pre-built image recognition model supplied by Azure, and customise it for your needs by supplying a set of images with which to update it. All model training and prediction is done in the cloud, so you don't need a powerful machine. Similarly, since you are starting with a model that has already been trained, you don't need a very large dataset or long training times to obtain good predictions (ideally). This vignette walks you through the process of creating and deploying a Custom Vision predictive service. 
+
+## Creating the resources
+
+You can create the Custom Vision resources using the AzureRMR framework for interacting with Resource Manager. Note that Custom Vision requires at least _two_ resources to be created: one for training, and one for prediction. The available service tiers for Custom Vision are `F0` (free, limited to 10k transactions per month) and `S0`.
+
+```r
+library(AzureVision)
+rg <- AzureRMR::get_azure_login("yourtenant")$
+    get_subscription("sub_id")$
+    get_resource_group("rgname")$
+
+res <- rg$create_cognitive_service("mycustvis",
+    service_type="CustomVision", service_tier="S0")
+pred_res <- rg$create_cognitive_service("mycustvispred",
+    service_type="CustomVision.Prediction", service_tier="S0")
+```
+
+## Training
+
+Custom Vision defines two different types of endpoint: a training endpoint, and a prediction endpoint. Somewhat confusingly, they can both share the same host, but use different paths and authentication keys. To start, call the `customvision_training_endpoint` function with the service URL and key.
+
+```r
+endp <- customvision_training_endpoint(
+    url="https://australiaeast.api.cognitive.microsoft.com",
+    key="training_key"
+)
+```
+
+### Creating the project
+
+Custom Vision is organised hierarchically. At the top level, we have a _project_, which represents the data and model for a specific task. Within a project, we have one or more _iterations_ of the model, built on different sets of training images. Each iteration in a project is independent: you can create (train) an iteration, deploy it, and delete it without affecting other iterations.
+
+You can see the projects that currently exist on the endpoint by calling `list_projects`. This returns a named list of project objects:
+
+```r
+list_projects(endp)
+```
+```
+$general_compact
+Azure Custom Vision project 'general_compact' (304fc776-d860-490a-b4ec-5964bb134743)
+  Endpoint: https://australiaeast.api.cognitive.microsoft.com/customvision/v3.0
+  Domain: classification.general.compact (0732100f-1a38-4e49-a514-c9b44c697ab5)
+  Export target: standard
+  Classification type: Multiclass
+
+$general_multilabel
+Azure Custom Vision project 'general_multilabel' (c485f10b-cb54-47a3-b585-624488335f58)
+  Endpoint: https://australiaeast.api.cognitive.microsoft.com/customvision/v3.0
+  Domain: classification.general (ee85a74c-405e-4adc-bb47-ffa8ca0c9f31)
+  Export target: none
+  Classification type: Multilabel
+
+$logo_obj
+Azure Custom Vision project 'logo_obj' (af82557f-6ead-401c-afd6-bb9d5a3b042b)
+  Endpoint: https://australiaeast.api.cognitive.microsoft.com/customvision/v3.0
+  Domain: object_detection.logo (1d8ffafe-ec40-4fb2-8f90-72b3b6cecea4)
+  Export target: none
+  Classification type: NA
+```
+
+There are three different types of projects, as implied by the list above:
+
+- A _multiclass classification_ project is for classifying images into a set of _tags_, or target labels. An image can be assigned to one tag only.
+- A _multilabel classification_ project is similar, but each image can have multiple tags assigned to it.
+- An _object detection_ project is for detecting which objects, if any, from a set of candidates are present in an image.
+
+The functions to create these projects are `create_classification_project` (which is used to create both multiclass and multilabel projects) and `create_object_detection_project`. Let's create a classification project:
+
+```r
+testproj <- create_classification_project(endp, "testproj", export_target="standard")
+testproj
+```
+```
+Azure Custom Vision project 'testproj' (db368447-e5da-4cd7-8799-0ccd8157323e)
+  Endpoint: https://australiaeast.api.cognitive.microsoft.com/customvision/v3.0
+  Domain: classification.general.compact (0732100f-1a38-4e49-a514-c9b44c697ab5)
+  Export target: standard
+  Classification type: Multiclass
+```
+
+Here, we specify the export target to be `standard` to support exporting the final model to one of various standalone formats, eg TensorFlow, CoreML or ONNX. The default is `none`, in which case the model stays on the Custom Vision server. The advantage of `none` is that the model can be more complex, resulting in potentially better accuracy. The type of project is multiclass classification, and the domain (the initial model used as the basis for training) is `general`. Other possible domains for classification include `landmarks` and `retail`.
+
+### Adding and tagging images
+
+Since a Custom Vision model is trained in Azure and not locally, we need to upload some images. The data we'll use comes from the Microsoft [Computer Vision Best Practices](https://github.com/microsoft/ComputerVision) project. This is a simple set of images containing 4 kinds of objects one might find in a fridge: cans, cartons, milk bottles, and water bottles.
+
+```r
+download.file(
+    "https://cvbp.blob.core.windows.net/public/datasets/image_classification/fridgeObjects.zip",
+    "fridgeObjects.zip"
+)
+unzip("fridgeObjects.zip")
+```
+
+The generic function to add images to a project is `add_images`, which takes a vector of filenames, Internet URLs or raw vectors as the images to upload. The method for classification projects also has an argument `tags` which can be used to assign labels to the images as they are uploaded.
+
+`add_images` returns a vector of _image IDs_, which are how Custom Vision keeps track of the images it uses. It should be noted that Custom Vision does not keep a record of the source filename or URL; it works _only_ with image IDs. A future release of AzureVision may automatically track the source metadata, allowing you to associate an ID with an actual image. For now, this must be done manually.
+
+Let's upload the fridge objects to the project. We'll keep aside 5 images from each class of object to use as validation data.
+
+```r
+cans <- dir("fridgeObjects/can", full.names=TRUE)
+cartons <- dir("fridgeObjects/carton", full.names=TRUE)
+milk <- dir("fridgeObjects/milk_bottle", full.names=TRUE)
+water <- dir("fridgeObjects/water_bottle", full.names=TRUE)
+
+# upload all but 5 images from cans and cartons, and tag them
+can_ids <- add_images(testproj, cans[-(1:5)], tags="can")
+carton_ids <- add_images(testproj, cartons[-(1:5)], tags="carton")
+```
+
+If you don't tag the images at upload time, you can do so later with `add_image_tags`:
+
+```r
+# upload all but 5 images from milk and water bottles
+milk_ids <- add_images(testproj, milk[-(1:5)])
+water_ids <- add_images(testproj, water[-(1:5)])
+
+add_image_tags(testproj, milk_ids, tags="milk_bottle")
+add_image_tags(testproj, water_ids, tags="water_bottle")
+```
+
+Other image functions to be aware of include `list_images`, `remove_images`, and `add_image_regions` (which is for object detection projects). A useful one is `browse_images`, which takes a vector of IDs and displays the corresponding images in your browser.
+
+```r
+browse_images(testproj, water_ids[1:5])
+```
+
+### Training the model
+
+Having uploaded the data, we can train the Custom Vision model with `train_model`. This trains the model on the server and returns a _model iteration_, which is the result of running the training algorithm on the current set of images. Each time you call `train_model`, for example to update the model after adding or removing images, you will obtain a different model iteration. In general, you can rely on AzureVision to keep track of the iterations for you, and automatically return the relevant results for the latest iteration.
+
+```r
+mod <- train_model(testproj)
+mod
+```
+```
+Azure Custom Vision model
+  Project/iteration: testproj/Iteration 1 (f243bb4c-e4f8-473e-9df0-190a407472be)
+```
+
+Optional arguments to `train_model` include:
+
+- `training_method`: Set this to "advanced" to force Custom Vision to do the training from scratch, rather than simply updating a pre-trained model. This also enables the other arguments below.
+- `max_time`: If `training_method == "advanced"`, the maximum runtime in hours for training the model. The default is 1 hour.
+- `force`: If `training_method == "advanced"`, whether to train the model anyway even if the images have not changed.
+- `email`: If `training_method == "advanced"`, an optional email address to send a notification to when the training is complete.
+- `wait`: Whether to wait until training completes before returning.
+
+Other model iteration management functions are `get_model` (to retrieve a previously trained iteration), `list_models` (retrieve all previously trained iterations), and `delete_model`.
+
+We can examine the model performance on the training data (which may be different to the current data!) with the `summary` method. For this toy problem, the model manages to obtain a perfect fit.
+
+```r
+summary(mod)
+```
+```
+$perTagPerformance
+                                    id         name precision precisionStdDeviation recall
+1 22ddd4bc-2031-43a1-b0ef-eb6b219eb6f7          can         1                     0      1
+2 301db6f9-b701-4dc6-8650-a9cf3fe4bb2e       carton         1                     0      1
+3 594ad770-83e5-4c77-825d-9249dae4a2c6  milk_bottle         1                     0      1
+4 eda5869a-cc75-41df-9c4c-717c10f79739 water_bottle         1                     0      1
+
+  recallStdDeviation averagePrecision    
+1                  0                1
+2                  0                1
+3                  0                1
+4                  0                1
+
+$precision
+[1] 1
+
+$precisionStdDeviation
+[1] 0
+
+$recall
+[1] 1
+
+$recallStdDeviation
+[1] 0
+
+$averagePrecision
+[1] 1
+```
+
+Obtaining predictions from the trained model is done with the `predict` method. By default, this returns the predicted tag (class label) for the image, but you can also get the predicted class probabilities by specifying `type="prob"`.
+
+```r
+validation_imgs <- c(cans[1:5], cartons[1:5], milk[1:5], water[1:5])
+validation_tags <- rep(c("can", "carton", "milk_bottle", "water_bottle"), each=5)
+
+predicted_tags <- predict(mod, validation_imgs)
+
+table(predicted_tags, validation_tags)
+```
+```
+              validation_tags
+predicted_tags can carton milk_bottle water_bottle
+  can            4      0           0            0
+  carton         0      5           0            0
+  milk_bottle    1      0           5            0
+  water_bottle   0      0           0            5
+```
+
+```r
+head(predict(mod, validation_imgs, type="prob"))
+```
+```
+              can       carton  milk_bottle water_bottle
+[1,] 9.999968e-01 8.977501e-08 5.855104e-11 3.154334e-06
+[2,] 9.732912e-01 3.454168e-10 4.610847e-06 2.670425e-02
+[3,] 3.019476e-01 5.779990e-04 6.974699e-01 4.506565e-06
+[4,] 5.072662e-01 2.849253e-03 4.856858e-01 4.198686e-03
+[5,] 9.962270e-01 5.411842e-07 3.540882e-03 2.316211e-04
+[6,] 3.145034e-11 1.000000e+00 2.574793e-10 4.242047e-14
+```
+
+This shows that the model got 19 out of 20 predictions correct on the validation data, misclassifying one of the cans as a milk bottle.
+
+## Deployment
+
+### Publishing to a prediction endpoint
+
+The code above demonstrates using the training endpoint to obtain predictions, which is really meant only for model testing and validation. For production purposes, we would normally _publish_ a trained model to a Custom Vision prediction endpoint. Among other things, a user with access to the training endpoint has complete freedom to modify the model and the data, whereas access to the prediction endpoint only allows getting predictions.
+
+Publishing a model requires knowing the Azure resource ID of the prediction endpoint. Here, we'll use the resource object that was created earlier using AzureRMR; you can also obtain this information from the Azure Portal.
+
+```r
+# publish to the prediction resource we created above
+publish_model(mod, "iteration1", pred_res)
+```
+
+Once a model has been published, we can obtain predictions from the prediction endpoint in a manner very similar to previously. Define a classification predictive service with `classification_service`, and then call the `predict` method:
+
+```r
+pred_endp <- customvision_prediction_endpoint(
+    url="https://australiaeast.api.cognitive.microsoft.com/",
+    key="prediction_key"
+)
+
+# service we published above
+pred_svc <- classification_service(pred_endp, testproj, "iteration1")
+
+# predictions from prediction endpoint -- same as before
+predsvc_tags <- predict(pred_svc, validation_imgs)
+table(predsvc_tags, validation_tags)
+```
+```
+              validation_tags
+predsvc_tags   can carton milk_bottle water_bottle
+  can            4      0           0            0
+  carton         0      5           0            0
+  milk_bottle    1      0           5            0
+  water_bottle   0      0           0            5
+```
+
+### Exporting as standalone
+
+As an alternative to deploying the model to an online predictive service resource, you can also export the model to a standalone format. This is only possible if the project was created to support exporting. The formats supported include:
+
+- ONNX 1.2
+- CoreML
+- TensorFlow or TensorFlow Lite
+- A Docker image for either the Linux, Windows or Raspberry Pi environment
+- Vision AI Development Kit (VAIDK)
+
+To export the model, call `export_model` and specify the target format. By default, the model will be downloaded to your local machine, but `export_model` also (invisibly) returns a URL from where it can be downloaded independently.
+
+```r
+export_model(mod, "linux docker")
+```
+```
+Downloading to f243bb4c-e4f8-473e-9df0-190a407472be.TensorFlow.zip
+trying URL 'https://irisprodae...'
+Content type 'application/octet-stream' length 4673656 bytes (4.5 MB)
+downloaded 4.5 MB
+```
+

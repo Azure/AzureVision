@@ -2,7 +2,7 @@
 print.customvision_model <- function(x, ...)
 {
     cat("Azure Custom Vision model\n")
-    cat("  Project/iteration: ", x$project$project$name, "/", x$id, "\n", sep="")
+    cat("  Project/iteration: ", x$project$project$name, "/", x$name, " (", x$id, ")", "\n", sep="")
     invisible(x)
 }
 
@@ -10,13 +10,14 @@ print.customvision_model <- function(x, ...)
 #' Create, retrieve and delete a model iteration
 #'
 #' @param project A Custom Vision project.
-#' @param object For the `delete_model` methods, A Custom Vision project or model, as appropriate.
+#' @param model A Custom Vision model.
+#' @param object For the `delete_model` method, a Custom Vision project or model, as appropriate.
 #' @param training_method The training method to use. The default "quick" is faster but may be less accurate. The "advanced" method is slower but produces better results.
 #' @param max_time For advanced training, the maximum training time in hours.
 #' @param force For advanced training, whether to refit the model even if the data has not changed since the last iteration.
 #' @param email For advanced training, an email address to notify when the training is complete.
 #' @param wait whether to wait until training is complete (or the maximum training time has elapsed) before returning.
-#' @param iteration For `get_model` and `delete_model.customvision_project`, the iteration ID.
+#' @param iteration For `get_model` and `delete_model.customvision_project`, either the iteration name or ID.
 #' @param as For `list_models`, the format in which to return results: as a named vector of model iteration IDs, or a list of model objects.
 #' @param confirm For the `delete_model` methods, whether to ask for confirmation first.
 #' @param ... Arguments passed to lower-level functions.
@@ -27,7 +28,7 @@ print.customvision_model <- function(x, ...)
 #'
 #' By default, AzureVision will use the latest model iteration for actions such as prediction, showing performance statistics, and so on. You can list the model iterations with `list_models`, and retrieve a specific iteration by passing the iteration ID to `get_model`.
 #' @return
-#' For `train_model` and `get_model`, an object of class `customvision_model` which is a handle to the iteration.
+#' For `train_model`, `get_model` and `rename_model`, an object of class `customvision_model` which is a handle to the iteration.
 #'
 #' For `list_models`, based on the `as` argument: `as="ids"` returns a named vector of model iteration IDs, while `as="list"` returns a list of model objects.
 #' @seealso
@@ -90,11 +91,18 @@ list_models <- function(project, as=c("ids", "list"))
 #' @export
 get_model <- function(project, iteration=NULL)
 {
-    if(is.null(iteration))
-        iteration <- list_models(project)[1]
-
+    iteration <- find_model_iteration(iteration, project)
     res <- do_training_op(project, file.path("iterations", iteration))
     make_model_iteration(res, project)
+}
+
+
+#' @rdname customvision_train
+#' @export
+rename_model <- function(object, name, ...)
+{
+    res <- do_training_op(object$project, file.path("iterations", object$id), body=list(name=name), http_verb="PATCH")
+    make_model_iteration(res, object$project)
 }
 
 
@@ -113,9 +121,7 @@ delete_model.customvision_project <- function(object, iteration=NULL, confirm=TR
     if(!confirm_delete("Are you sure you want to delete this model iteration?", confirm))
         return(invisible(NULL))
 
-    if(is.null(iteration))
-        iteration <- list_models(object)[[1]]$id
-
+    iteration <- find_model_iteration(iteration, project)
     do_training_op(object, file.path("iterations", iteration), http_verb="DELETE")
     invisible(NULL)
 }
@@ -190,13 +196,16 @@ summary.customvision_model <- function(object, ...)
 #' Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format in Azure storage, which can then be downloaded. Each iteration of the model can be published or exported separately.
 #'
 #' The `format` argument to `export_model` can be one of the following. Note that exporting a model requires that the project was created with support for it.
-#' - "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
+#' - "onnx": ONNX 1.2
 #' - "coreml": CoreML, for iOS 11 devices
 #' - "tensorflow": TensorFlow
+#' - "tensorflow lite": TensorFlow Lite for Android devices
 #' - "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
 #' - "vaidk": Vision AI Development Kit
 #' @return
 #' `export_model` returns the URL of the exported file, invisibly if `download=TRUE`.
+#'
+#' `list_model_exports` returns a data frame detailing the formats the current model has been exported to, along with their download URLs.
 #' @seealso
 #' [`train_model`], [`get_model`], [`customvision_predictive_service`], [`predict.classification_service`], [`predict.object_detection_service`]
 #' @rdname customvision_publish
@@ -209,6 +218,7 @@ publish_model <- function(model, name, prediction_resource)
     op <- file.path("iterations", model$id, "publish")
     options <- list(publishName=name, predictionId=prediction_resource)
     do_training_op(model$project, op, options=options, http_verb="POST")
+    invisible(NULL)
 }
 
 
@@ -234,31 +244,54 @@ export_model <- function(model, format, download=TRUE, destfile=NULL)
     if(!is_compact_domain(settings$domainId))
         stop("Project was not created with support for exporting", call.=FALSE)
 
-    platform <- get_export_platform(format)
-    if(platform$platform == "VAIDK" && is_empty(settings$targetExportPlatforms))
+    plat <- get_export_platform(format)
+    if(plat$platform == "VAIDK" && is_empty(settings$targetExportPlatforms))
         stop("Project does not support exporting to Vision AI Dev Kit format", call.=FALSE)
 
-    op <- file.path("iterations", model$id, "export")
-    for(i in 1:500)
+    # if already exported, don't export again
+    exports <- list_model_exports(model)
+    this_exp <- find_model_export(plat, exports)
+    if(is_empty(this_exp))
     {
-        res <- do_training_op(model$project, op, options=platform, http_verb="POST")
-        status <- res$status
-        if(res$status %in% c("Done", "Failed"))
-            break
-        Sys.sleep(10)
-    }
-    if(res$status != "Done")
-        stop("Error exporting model", call.=FALSE)
+        op <- file.path("iterations", model$id, "export")
+        res <- do_training_op(model$project, op, options=plat, http_verb="POST")
 
+        # wait for it to appear in the list of exports
+        for(i in 1:500)
+        {
+            exports <- list_model_exports(model)
+            this_exp <- find_model_export(plat, exports)
+            if(is_empty(this_exp))
+                stop("Exported model not found", call.=FALSE)
+
+            status <- exports$status[this_exp]
+            if(status %in% c("Done", "Failed"))
+                break
+            Sys.sleep(5)
+        }
+        if(status != "Done")
+            stop("Unable to export model", call.=FALSE)
+    }
+
+    dl_link <- exports$downloadUri[this_exp]
     if(download)
     {
         if(is.null(destfile))
-            destfile <- basename(httr::parse_url(res$downloadUri)$path)
+            destfile <- basename(httr::parse_url(dl_link)$path)
         message("Downloading to ", destfile)
-        utils::download.file(res$downloadUri, destfile)
-        invisible(res$downloadUri)
+        utils::download.file(dl_link, destfile)
+        invisible(dl_link)
     }
-    else res$downloadUri
+    else dl_link
+}
+
+
+#' @rdname customvision_publish
+#' @export
+list_model_exports <- function(model)
+{
+    op <- file.path("iterations", model$id, "export")
+    do_training_op(model$project, op, simplifyVector=TRUE)
 }
 
 
@@ -271,7 +304,7 @@ as_datetime <- function(x, format="%Y-%m-%dT%H:%M:%S", tz="UTC")
 make_model_iteration <- function(iteration, project)
 {
     structure(
-        list(project=project, id=iteration$id),
+        list(project=project, id=iteration$id, name=iteration$name),
         class="customvision_model"
     )
 }
@@ -284,11 +317,44 @@ get_export_platform <- function(format)
         "arm docker"=list(platform="DockerFile", flavor="ARM"),
         "linux docker"=list(platform="DockerFile", flavor="Linux"),
         "windows docker"=list(platform="DockerFile", flavor="Windows"),
-        "onnx 1.0"=list(platform="ONNX", flavor="ONNX10"),
-        "onnx 1.2"=list(platform="ONNX", flavor="ONNX12"),
-        "tensorflow"=list(platform="TensorFlow"),
+        "onnx"=list(platform="ONNX"),
+        "tensorflow"=list(platform="TensorFlow", flavor="TensorFlowNormal"),
+        "tensorflow lite"=list(platform="TensorFlow", flavor="TensorFlowLite"),
         "vaidk"=list(platform="VAIDK"),
         stop("Unrecognised export format '", format, "'", call.=FALSE)
     )
 }
+
+
+find_model_export <- function(platform, exports)
+{
+    this_plat <- exports$platform == platform$platform
+    this_flav <- if(!is.null(platform$flavor))
+        exports$flavor == platform$flavor
+    else TRUE
+    which(this_plat & this_flav)
+}
+
+
+find_model_iteration <- function(iteration=NULL, project)
+{
+    iters <- list_models(project)
+
+    if(is.null(iteration))
+        return(iters[1])
+
+    if(is_guid(iteration))
+    {
+        if(!(iteration %in% iters))
+            stop("Invalid model iteration ID", call.=FALSE)
+        return(iteration)
+    }
+    else
+    {
+        if(!(iteration %in% names(iters)))
+            stop("Invalid model iteration name", call.=FALSE)
+        return(iters[iteration])
+    }
+}
+
 

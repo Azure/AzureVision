@@ -13,7 +13,7 @@ test_that("Computer Vision endpoint works with URL",
     endp <- computervision_endpoint(vision_url, key=vision_key)
     expect_is(endp, c("computervision_endpoint", "cognitive_endpoint"))
 
-    res_doms <- list_domains(endp)
+    res_doms <- list_computervision_domains(endp)
     expect_type(res_doms, "character")
 
     img <- httr::parse_url(storage)

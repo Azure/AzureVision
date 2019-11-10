@@ -1,9 +1,11 @@
 #' Endpoint objects for computer vision services
 #'
 #' @param url The URL of the endpoint.
+#' @param key A subscription key. Can be single-service or multi-service.
+#' @param aad_token For the Computer Vision endpoint, an OAuth token object, of class [`AzureAuth::AzureToken`]. You can supply this as an alternative to a subscription key.
 #' @param ... Other arguments to pass to [`AzureCognitive::cognitive_endpoint`].
 #' @details
-#' These are functions to create service-specific endpoint objects. They handle differences between the services in how they perform authentication, endpoint paths, and so on.
+#' These are functions to create service-specific endpoint objects. Computer Vision supports authentication via either a subscription key or Azure Active Directory (AAD) token; Custom Vision only supports subscription key. Note that there are _two_ kinds of Custom Vision endpoint, one for training and the other for prediction.
 #' @return
 #' An object inheriting from `cognitive_endpoint`. The subclass indicates the type of service/endpoint: Computer Vision, Custom Vision training, or Custom Vision prediction.
 #' @seealso
@@ -18,25 +20,31 @@
 #' customvision_prediction_endpoint("https://westus.api.cognitive.microsoft.com", key="key")
 #'
 #' @export
-computervision_endpoint <- function(url, ...)
+computervision_endpoint <- function(url, key=NULL, aad_token=NULL, ...)
 {
-    cognitive_endpoint(url, service_type="ComputerVision", ...)
+    endp <- cognitive_endpoint(url, service_type="ComputerVision", key=key, aad_token=aad_token, ...)
+    endp$url$path <- file.path("vision", getOption("azure_computervision_api_version"))
+    endp
 }
 
 
 #' @rdname endpoint
 #' @export
-customvision_training_endpoint <- function(url, ...)
+customvision_training_endpoint <- function(url, key=NULL, ...)
 {
-    cognitive_endpoint(url, service_type="CustomVision.Training", ..., auth_header="training-key")
+    endp <- cognitive_endpoint(url, service_type="CustomVision.Training", key=key, ..., auth_header="training-key")
+    endp$url$path <- file.path("customvision", getOption("azure_customvision_training_api_version"))
+    endp
 }
 
 
 #' @rdname endpoint
 #' @export
-customvision_prediction_endpoint <- function(url, ...)
+customvision_prediction_endpoint <- function(url, key=NULL, ...)
 {
-    cognitive_endpoint(url, service_type="CustomVision.Prediction", ..., auth_header="prediction-key")
+    endp <- cognitive_endpoint(url, service_type="CustomVision.Prediction", key=key, ..., auth_header="prediction-key")
+    endp$url$path <- file.path("customvision", getOption("azure_customvision_prediction_api_version"))
+    endp
 }
 
 
