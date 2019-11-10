@@ -8,7 +8,7 @@
 \alias{delete_model}
 \alias{delete_model.customvision_project}
 \alias{delete_model.customvision_model}
-\title{Create, retrieve and delete a model iteration}
+\title{Create, retrieve, rename and delete a model iteration}
 \usage{
 train_model(project, training_method = c("quick", "advanced"),
   max_time = 1, force = FALSE, email = NULL,
@@ -18,7 +18,7 @@ list_models(project, as = c("ids", "list"))
 
 get_model(project, iteration = NULL)
 
-rename_model(object, name, ...)
+rename_model(model, name, ...)
 
 delete_model(object, ...)
 
@@ -44,13 +44,15 @@ delete_model(object, ...)
 
 \item{iteration}{For \code{get_model} and \code{delete_model.customvision_project}, either the iteration name or ID.}
 
-\item{object}{For the \code{delete_model} method, a Custom Vision project or model, as appropriate.}
+\item{model}{A Custom Vision model.}
+
+\item{name}{For \code{rename_model}, the new name for the model.}
 
 \item{...}{Arguments passed to lower-level functions.}
 
-\item{confirm}{For the \code{delete_model} methods, whether to ask for confirmation first.}
+\item{object}{For the \code{delete_model} method, a Custom Vision project or model, as appropriate.}
 
-\item{model}{A Custom Vision model.}
+\item{confirm}{For the \code{delete_model} methods, whether to ask for confirmation first.}
 }
 \value{
 For \code{train_model}, \code{get_model} and \code{rename_model}, an object of class \code{customvision_model} which is a handle to the iteration.
@@ -58,7 +60,7 @@ For \code{train_model}, \code{get_model} and \code{rename_model}, an object of c
 For \code{list_models}, based on the \code{as} argument: \code{as="ids"} returns a named vector of model iteration IDs, while \code{as="list"} returns a list of model objects.
 }
 \description{
-Create, retrieve and delete a model iteration
+Create, retrieve, rename and delete a model iteration
 }
 \details{
 Training a Custom Vision model results in a \emph{model iteration}. Each iteration is based on the current set of images uploaded to the endpoint. Successive model iterations trained on different image sets do not overwrite previous ones.

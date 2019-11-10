@@ -46,6 +46,7 @@ The \code{format} argument to \code{export_model} can be one of the following. N
 \item "onnx": ONNX 1.2
 \item "coreml": CoreML, for iOS 11 devices
 \item "tensorflow": TensorFlow
+\item "tensorflow lite": TensorFlow Lite for Android devices
 \item "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
 \item "vaidk": Vision AI Development Kit
 }

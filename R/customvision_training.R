@@ -7,7 +7,7 @@ print.customvision_model <- function(x, ...)
 }
 
 
-#' Create, retrieve and delete a model iteration
+#' Create, retrieve, rename and delete a model iteration
 #'
 #' @param project A Custom Vision project.
 #' @param model A Custom Vision model.
@@ -18,6 +18,7 @@ print.customvision_model <- function(x, ...)
 #' @param email For advanced training, an email address to notify when the training is complete.
 #' @param wait whether to wait until training is complete (or the maximum training time has elapsed) before returning.
 #' @param iteration For `get_model` and `delete_model.customvision_project`, either the iteration name or ID.
+#' @param name For `rename_model`, the new name for the model.
 #' @param as For `list_models`, the format in which to return results: as a named vector of model iteration IDs, or a list of model objects.
 #' @param confirm For the `delete_model` methods, whether to ask for confirmation first.
 #' @param ... Arguments passed to lower-level functions.
@@ -99,10 +100,10 @@ get_model <- function(project, iteration=NULL)
 
 #' @rdname customvision_train
 #' @export
-rename_model <- function(object, name, ...)
+rename_model <- function(model, name, ...)
 {
-    res <- do_training_op(object$project, file.path("iterations", object$id), body=list(name=name), http_verb="PATCH")
-    make_model_iteration(res, object$project)
+    res <- do_training_op(model$project, file.path("iterations", model$id), body=list(name=name), http_verb="PATCH")
+    make_model_iteration(res, model$project)
 }
 
 
