@@ -279,7 +279,7 @@ As an alternative to deploying the model to an online predictive service resourc
 To export the model, call `export_model` and specify the target format. By default, the model will be downloaded to your local machine, but `export_model` also (invisibly) returns a URL from where it can be downloaded independently.
 
 ```r
-export_model(mod, "linux docker")
+export_model(mod, "tensorflow")
 ```
 ```
 Downloading to f243bb4c-e4f8-473e-9df0-190a407472be.TensorFlow.zip
