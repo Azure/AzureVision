@@ -59,7 +59,7 @@ test_that("Training endpoint prediction and export works",
     expect_type(pred1, "character")
     expect_identical(length(pred1), length(cans))
 
-    pred2 <- predict(mod, "../resources/can1.jpg", type="prob")
+    pred2 <- predict(mod, "../../inst/images/can1.jpg", type="prob")
     expect_is(pred2, "matrix")
     expect_type(pred2, "double")
     expect_identical(dim(pred2), c(1L, 2L))
@@ -68,7 +68,7 @@ test_that("Training endpoint prediction and export works",
     expect_is(pred3, "list")
     expect_true(all(sapply(pred3, is.data.frame)))
 
-    expect_error(predict(mod, c(cans, "../resources/can1.jpg")))
+    expect_error(predict(mod, c(cans, "../../inst/images/can1.jpg")))
 
     exp_url <- export_model(mod, "tensorflow lite", download=FALSE)
     expect_true(is_url(exp_url))

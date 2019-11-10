@@ -37,9 +37,9 @@ These are the images we'll use to illustrate how the package works.
 
 |Filename|Description|Picture|
 |:------:|:---------:|:-----:|
-|`bill.jpg`|A portrait of Bill Gates|<img src="bill.jpg" width=300/>|
-|`park.jpg`|A picture of a city park|<img src="park.jpg" width=300/>|
-|`gettysburg.jpg`|The text of the Gettysburg Address|<img src="gettysburg.png" width=300/>|
+|`bill.jpg`|A portrait of Bill Gates|<img src="../inst/images/bill.jpg" width=300/>|
+|`park.jpg`|A picture of a city park|<img src="../inst/images/park.jpg" width=300/>|
+|`gettysburg.jpg`|The text of the Gettysburg Address|<img src="../inst/images/gettysburg.png" width=300/>|
 
 An image to send to the endpoint can be specified as a filename, a publicly accessible Internet URL, or a raw vector. For example, these calls are equivalent, assuming the underlying image is the same:
 
@@ -190,4 +190,4 @@ read_text(vis, "gettysburg.png")
 ```r
 make_thumbnail(vis, "bill.jpg", "bill_thumb.jpg")
 ```
-<img src="bill_thumb.jpg"/>
+<img src="../inst/images/bill_thumb.jpg"/>

@@ -43,7 +43,7 @@ test_that("Adding and tagging images works",
     img_tags <- do.call(rbind.data.frame, img_df$tags)$tagName
     expect_identical(img_tags, tags)
 
-    img_loc <- add_images(proj, paste0("../resources/", c("can1.jpg", "carton1.jpg")))
+    img_loc <- add_images(proj, paste0("../../inst/images/", c("can1.jpg", "carton1.jpg")))
     expect_type(img_loc, "character")
 
     untagged_ids <- list_images(proj, "untagged")

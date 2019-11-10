@@ -72,7 +72,7 @@ test_that("Computer Vision endpoint works with local file",
 {
     endp <- computervision_endpoint(vision_url, key=vision_key)
 
-    img <- "../resources/bill.jpg"
+    img <- "../../inst/images/bill.jpg"
 
     res_analyze <- analyze(endp, img)
     expect_is(res_analyze, "list")
