@@ -12,7 +12,7 @@ The basic idea behind Custom Vision is to take a pre-built image recognition mod
 
 ## Creating the resources
 
-You can create the Custom Vision resources using the AzureRMR framework for interacting with Resource Manager. Note that Custom Vision requires at least _two_ resources to be created: one for training, and one for prediction. The available service tiers for Custom Vision are `F0` (free, limited to 10k transactions per month) and `S0`.
+You can create the Custom Vision resources using the AzureRMR framework for interacting with Resource Manager. Note that Custom Vision requires at least _two_ resources to be created: one for training, and one for prediction. The available service tiers for Custom Vision are `F0` (free, limited to 2 projects for training and 10k transactions/month for prediction) and `S0`.
 
 ```r
 library(AzureVision)
