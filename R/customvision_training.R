@@ -121,7 +121,7 @@ delete_model.customvision_project <- function(object, iteration=NULL, confirm=TR
     if(!confirm_delete("Are you sure you want to delete this model iteration?", confirm))
         return(invisible(NULL))
 
-    iteration <- find_model_iteration(iteration, project)
+    iteration <- find_model_iteration(iteration, object)
     do_training_op(object, file.path("iterations", iteration), http_verb="DELETE")
     invisible(NULL)
 }
