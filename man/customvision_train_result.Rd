@@ -30,6 +30,20 @@ Display model iteration details
 \details{
 \code{show_model} displays the metadata for a model iteration: the name (assigned by default), model training status, publishing details, and so on. \code{show_training_performance} displays summary statistics for the model's performance on the training data. The \code{summary} method for Custom Vision model objects simply calls \code{show_training_performance}.
 }
+\examples{
+\dontrun{
+
+endp <- customvision_training_endpoint(url="endpoint_url", key="key")
+myproj <- get_project(endp, "myproject")
+mod <- get_model(myproj)
+
+show_model(mod)
+
+show_training_performance(mod)
+summary(mod)
+
+}
+}
 \seealso{
 \code{\link{train_model}}
 }

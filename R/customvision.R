@@ -45,9 +45,10 @@ print.customvision_project <- function(x, ...)
 #' A Custom Vision project contains the metadata for a model: its intended purpose (classification vs object detection), the domain, the set of training images, and so on. Once you have created a project, you upload images to it, and train models based on those images. A trained model can then be published as a predictive service, or exported for standalone use.
 #'
 #' By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting `export_target="standard"` enables exporting to the following formats:
-#' - "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
+#' - "onnx": ONNX 1.2
 #' - "coreml": CoreML, for iOS 11 devices
 #' - "tensorflow": TensorFlow
+#' - "tensorflow lite": TensorFlow Lite for Android devices
 #' - "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
 #'
 #' Setting `export_target="vaidk"` allows exporting to Vision AI Development Kit format, in addition to the above.
@@ -55,6 +56,24 @@ print.customvision_project <- function(x, ...)
 #' `delete_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
 #' @seealso
 #' [`customvision_training_endpoint`], [`add_images`], [`train_model`], [`publish_model`], [`predict.customvision_model`], [`do_training_op`]
+#' @examples
+#' \dontrun{
+#'
+#' endp <- customvision_training_endpoint(url="endpoint_url", key="key")
+#'
+#' create_classification_project(endp, "myproject")
+#' create_classification_project(endp, "mymultilabelproject", multiple_tags=TRUE)
+#' create_object_detection_project(endp, "myobjdetproj")
+#'
+#' create_classification_project(endp, "mystdproject", export_target="standard")
+#'
+#' list_projects(endp)
+#'
+#' get_project(endp, "myproject")
+#'
+#' update_project(endp, "myproject", export_target="vaidk")
+#'
+#' }
 #' @aliases customvision_project
 #' @rdname customvision_project
 #' @export

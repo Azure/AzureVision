@@ -69,6 +69,25 @@ You must have at least 5 images per tag for a classification project, and 15 ima
 
 By default, AzureVision will use the latest model iteration for actions such as prediction, showing performance statistics, and so on. You can list the model iterations with \code{list_models}, and retrieve a specific iteration by passing the iteration ID to \code{get_model}.
 }
+\examples{
+\dontrun{
+
+endp <- customvision_training_endpoint(url="endpoint_url", key="key")
+myproj <- get_project(endp, "myproject")
+
+train_model(myproj)
+train_model(myproj, method="advanced", force=TRUE, email="me@example.com")
+
+list_models(myproj)
+
+mod <- get_model(myproj)
+rename(mod, "mymodel")
+mod <- get_model(myproj, "mymodel")
+
+delete_model(mod)
+
+}
+}
 \seealso{
 \code{\link{show_model}}, \code{\link{show_training_performance}}, \code{\link{publish_model}}
 }

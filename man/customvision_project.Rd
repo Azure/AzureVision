@@ -55,13 +55,33 @@ A Custom Vision project contains the metadata for a model: its intended purpose 
 
 By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting \code{export_target="standard"} enables exporting to the following formats:
 \itemize{
-\item "onnx 1.0", "onnx 1.2": ONNX 1.0 or 1.2
+\item "onnx": ONNX 1.2
 \item "coreml": CoreML, for iOS 11 devices
 \item "tensorflow": TensorFlow
+\item "tensorflow lite": TensorFlow Lite for Android devices
 \item "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
 }
 
 Setting \code{export_target="vaidk"} allows exporting to Vision AI Development Kit format, in addition to the above.
+}
+\examples{
+\dontrun{
+
+endp <- customvision_training_endpoint(url="endpoint_url", key="key")
+
+create_classification_project(endp, "myproject")
+create_classification_project(endp, "mymultilabelproject", multiple_tags=TRUE)
+create_object_detection_project(endp, "myobjdetproj")
+
+create_classification_project(endp, "mystdproject", export_target="standard")
+
+list_projects(endp)
+
+get_project(endp, "myproject")
+
+update_project(endp, "myproject", export_target="vaidk")
+
+}
 }
 \seealso{
 \code{\link{customvision_training_endpoint}}, \code{\link{add_images}}, \code{\link{train_model}}, \code{\link{publish_model}}, \code{\link{predict.customvision_model}}, \code{\link{do_training_op}}
