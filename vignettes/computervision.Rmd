@@ -18,7 +18,7 @@ You can create a Computer Vision resource using the AzureRMR framework for inter
 library(AzureVision)
 rg <- AzureRMR::get_azure_login("yourtenant")$
     get_subscription("sub_id")$
-    get_resource_group("rgname")$
+    get_resource_group("rgname")
 
 res <- rg$create_cognitive_service("myvis",
     service_type="ComputerVision", service_tier="S1")

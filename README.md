@@ -90,7 +90,7 @@ For Computer Vision, the available service tiers are `F0` (free, limited to 20 A
 ```r
 rg <- AzureRMR::get_azure_login("yourtenant")$
     get_subscription("sub_id")$
-    get_resource_group("rgname")$
+    get_resource_group("rgname")
 
 # Computer Vision
 rg$create_cognitive_service("myvis", service_type="ComputerVision", service_tier="S1")
