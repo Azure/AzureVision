@@ -26,6 +26,15 @@ Connect to a Custom Vision predictive service
 \details{
 These functions are handles to a predictive service that was previously published from a trained model. They have \code{predict} methods defined for them.
 }
+\examples{
+\dontrun{
+
+pred_endp <- customvision_prediction_endpoint(url="endpoint_url", key="pred_key")
+classification_service(pred_endp, "project_id", "publishedname")
+object_detection_service(pred_endp, "project2_id", "publishedname2")
+
+}
+}
 \seealso{
 \code{\link{customvision_prediction_endpoint}}, \code{\link{customvision_project}}
 
