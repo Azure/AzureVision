@@ -20,6 +20,15 @@
 #' `add_tags` and `add_negative_tag` return a data frame containing the names and IDs of the tags added.
 #' @seealso
 #' [`add_image_tags`], [`remove_image_tags`]
+#' @examples
+#' \dontrun{
+#'
+#' add_tags(myproj, "newtag")
+#' add_negative_tag(myproj)
+#' remove_tags(myproj, "_negative_")
+#' add_negative_tag(myproj, "nothing")
+#'
+#' }
 #' @rdname customvision_tags
 #' @aliases customvision_tags
 #' @export
@@ -122,15 +131,26 @@ remove_tags <- function(project, tags, confirm=TRUE)
 #' `add_image_tags` is for tagging images that were uploaded previously, while `remove_image_tags` untags them. Adding tags does not remove previously assigned ones. Similarly, removing one tag from an image leaves any other tags intact.
 #'
 #' Tags can be specified in the following ways:
-#' - As a single character string. In this case, the tag will be applied to all image IDs.
-#' - As a vector of strings, with length equal to the length of `image_ids`. The tags will be applied to the images in order.
-#' - As a _list_ of vectors of strings, with the length of the list equal to the length of `image_ids`. Each vector in the list contains the tags to be assigned to the corresponding image.
+#' - For a regular classification project (one tag per image), as a vector of strings. The tags will be applied to the images in order. If the length of the vector is 1, it will be recycled to the length of `image_ids`.
+#' - For a multilabel classification project (multiple tags per image), as a _list_ of vectors of strings. Each vector in the list contains the tags to be assigned to the corresponding image. If the length of the list is 1, it will be recycled to the length of `image_ids`.
+#'
+#' If the length of the vector is 1, it will be recycled to the length of `image_ids`.
 #' @return
 #' The vector of IDs for the images affected, invisibly.
 #' @seealso
 #' [`add_images`], [`add_tags`]
 #'
 #' [`add_image_regions`] for object detection projects
+#' @examples
+#' \dontrun{
+#'
+#' imgs <- dir("path/to/images", full.names=TRUE)
+#' img_ids <- add_images(myproj, imgs)
+#' add_image_tags(myproj, "mytag")
+#' remove_image_tags(myproj, img_ids[1])
+#' add_image_tags(myproj, img_ids[1], "myothertag")
+#'
+#' }
 #' @aliases customvision_image_tags
 #' @rdname customvision_image_tags
 #' @export

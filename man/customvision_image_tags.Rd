@@ -33,9 +33,21 @@ Tag and untag images uploaded to a project
 
 Tags can be specified in the following ways:
 \itemize{
-\item As a single character string. In this case, the tag will be applied to all image IDs.
-\item As a vector of strings, with length equal to the length of \code{image_ids}. The tags will be applied to the images in order.
-\item As a \emph{list} of vectors of strings, with the length of the list equal to the length of \code{image_ids}. Each vector in the list contains the tags to be assigned to the corresponding image.
+\item For a regular classification project (one tag per image), as a vector of strings. The tags will be applied to the images in order. If the length of the vector is 1, it will be recycled to the length of \code{image_ids}.
+\item For a multilabel classification project (multiple tags per image), as a \emph{list} of vectors of strings. Each vector in the list contains the tags to be assigned to the corresponding image. If the length of the list is 1, it will be recycled to the length of \code{image_ids}.
+}
+
+If the length of the vector is 1, it will be recycled to the length of \code{image_ids}.
+}
+\examples{
+\dontrun{
+
+imgs <- dir("path/to/images", full.names=TRUE)
+img_ids <- add_images(myproj, imgs)
+add_image_tags(myproj, "mytag")
+remove_image_tags(myproj, img_ids[1])
+add_image_tags(myproj, img_ids[1], "myothertag")
+
 }
 }
 \seealso{

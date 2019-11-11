@@ -17,28 +17,83 @@
 #' - A raw vector, or a list of raw vectors, holding the binary contents of the image files.
 #'
 #' Uploaded images can also have _tags_ added (for a classification project) or _regions_ (for an object detection project). Classification tags can be specified in the following ways:
-#' - As a single character string. In this case, the tag will be applied to all image IDs.
-#' - As a vector of strings, with length equal to the length of `image_ids`. The tags will be applied to the images in order.
-#' - As a _list_ of vectors of strings, with the length of the list equal to the length of `image_ids`. Each vector in the list contains the tags to be assigned to the corresponding image.
+#' - For a regular classification project (one tag per image), as a vector of strings. The tags will be applied to the images in order. If the length of the vector is 1, it will be recycled to the length of `image_ids`.
+#' - For a multilabel classification project (multiple tags per image), as a _list_ of vectors of strings. Each vector in the list contains the tags to be assigned to the corresponding image. If the length of the list is 1, it will be recycled to the length of `image_ids`.
+#'
+#' If the length of the vector is 1, it will be recycled to the length of `image_ids`.
 #'
 #' Object detection projects also have tags, but they are specified as part of the `regions` argument. The regions to add should be specified as a list of data frames, with one data frame per image. Each data frame should have one row per region, and the following columns:
 #' - `left`, `top`, `width`, `height`: the location and dimensions of the region bounding box, normalised to be between 0 and 1.
 #' - `tag`: the name of the tag to associate with the region.
-#' Any other columns in the data frame will be ignored.
 #'
-#' Note that once uploaded, images are identified only by their ID; there is no general link back to the source filename or URL.
+#' Any other columns in the data frame will be ignored. If the length of the list is 1, it will be recycled to the length of `image_ids`.
+#'
+#' Note that once uploaded, images are identified only by their ID; there is no general link back to the source filename or URL. If you don't include tags or regions in the `add_images` call, be sure to save the returned IDs and then call [`add_image_tags`] or [`add_image_regions`] as appropriate.
 #' @return
 #' For `add_images`, the vector of IDs of the uploaded images.
 #'
 #' For `list_images`, based on the value of the `as` argument. The default is a vector of image IDs; `as="list"` returns a (nested) list of image metadata with one component per image; and `as="dataframe"` returns the same metadata but reshaped into a data frame.
-#'
-#' For `remove_images`, NULL on successful removal.
 #' @seealso
 #' [`add_image_tags`] and [`add_image_regions`] to add tags and regions to images, if not done at upload time
 #'
 #' [`add_tags`], [`list_tags`], [`remove_tags`]
 #'
 #' [`customvision_project`]
+#' @examples
+#' \dontrun{
+#'
+#' endp <- customvision_training_endpoint(url="endpoint_url", key="key")
+#'
+#' # classification
+#' proj1 <- create_classification_project(endp, "myproject")
+#' list_images(proj1)
+#' imgs <- dir("path/to/images", full.names=TRUE)
+#'
+#' # recycling: apply one tag to all images
+#' add_images(proj1, imgs, tags="mytag")
+#' list_images(proj1, include="tagged", as="dataframe")
+#'
+#' # different tags per image
+#' add_images(proj1, c("cat.jpg", "dog.jpg", tags=c("cat", "dog"))
+#'
+#' # adding online images
+#' host <- "https://mysite.example.com/"
+#' img_urls <- paste0(host, c("img1.jpg", "img2.jpg", "img3.jpg"))
+#' add_images(proj1, img_urls, tags="mytag")
+#'
+#' # multiple label classification
+#' proj2 <- create_classification_project(endp, "mymultilabelproject", multiple_tags=TRUE)
+#'
+#' add_images(proj2, imgs, tags=list(c("tag1", "tag2")))
+#' add_images(proj2, c("catanddog.jpg", "cat.jpg", "dog.jpg"),
+#'     tags=list(
+#'         c("cat", "dog"),
+#'         "cat",
+#'         "dog"
+#'     )
+#' )
+#'
+#' # object detection
+#' proj3 <- create_object_detection_project(endp, "myobjdetproj")
+#'
+#' regions <- list(
+#'     data.frame(
+#'         tag=c("cat", "dog"),
+#'         left=c(0.1, 0.5),
+#'         top=c(0.25, 0.28),
+#'         width=c(0.24, 0.21),
+#'         height=c(0.7, 0.6)
+#'     ),
+#'     data.frame(
+#'         tag="cat", left=0.5, top=0.35, width=0.25, height=0.62
+#'     ),
+#'     data.frame(
+#'         tag="dog", left=0.07, top=0.12, width=0.79, height=0.5
+#'     )
+#' )
+#' add_images(proj3, c("catanddog.jpg", "cat.jpg", "dog.jpg"), regions=regions)
+#'
+#' }
 #' @aliases customvision_images
 #' @rdname customvision_images
 #' @export

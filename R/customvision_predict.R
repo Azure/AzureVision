@@ -14,6 +14,26 @@
 #' - A raw vector, or a list of raw vectors, holding the binary contents of the image files.
 #' @seealso
 #' [`train_model`], [`publish_model`], [`classification_service`], [`object_detection_service`]
+#' @examples
+#' \dontrun{
+#'
+#' # predicting with the training endpoint
+#' endp <- customvision_training_endpoint(url="endpoint_url", key="key")
+#' myproj <- get_project(endp, "myproject")
+#' mod <- get_model(myproj)
+#'
+#' predict(mod, "testimage.jpg")
+#' predict(mod, "https://mysite.example.com/testimage.jpg", type="prob")
+#'
+#' imgraw <- readBin("testimage.jpg", "raw", file.size("testimage.jpg"))
+#' predict(mod, imgraw, type="list")
+#'
+#' # predicting with the prediction endpoint
+#' pred_endp <- customvision_prediction_endpoint(url="endpoint_url", key="pred_key")
+#' pred_svc <- classification_service(pred_endp, testproj, "iteration1")
+#' predict(pred_svc, "testimage.jpg")
+#'
+#' }
 #' @aliases predict
 #' @rdname customvision_predict
 #' @export

@@ -44,6 +44,37 @@ The regions to add should be specified as a list of data frames, with one data f
 Any other columns in the data frame will be ignored.
 }
 }
+\examples{
+\dontrun{
+
+img_ids <- add_images(myproj, c("catanddog.jpg", "cat.jpg", "dog.jpg"))
+
+regions <- list(
+    data.frame(
+        tag=c("cat", "dog"),
+        left=c(0.1, 0.5),
+        top=c(0.25, 0.28),
+        width=c(0.24, 0.21),
+        height=c(0.7, 0.6)
+    ),
+    data.frame(
+        tag="cat", left=0.5, top=0.35, width=0.25, height=0.62
+    ),
+    data.frame(
+        tag="dog", left=0.07, top=0.12, width=0.79, height=0.5
+    )
+)
+
+add_image_regions(myproj, img_ids, regions)
+remove_image_regions(myproj, img_ids[3])
+add_image_regions(myproj, img_ids[3],
+    list(data.frame(
+        tag="dog", left=0.5, top=0.12, width=0.4, height=0.7
+    ))
+)
+
+}
+}
 \seealso{
 \code{\link{add_images}}, \code{\link{add_tags}}
 

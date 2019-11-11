@@ -53,6 +53,16 @@ A \emph{negative tag} is a special tag that represents the absence of any other 
 You can add a negative tag to a project with the \code{add_negative_tag} method. Once defined, a negative tag is treated like any other tag. A project can only have one negative tag defined.
 }
 
+\examples{
+\dontrun{
+
+add_tags(myproj, "newtag")
+add_negative_tag(myproj)
+remove_tags(myproj, "_negative_")
+add_negative_tag(myproj, "nothing")
+
+}
+}
 \seealso{
 \code{\link{add_image_tags}}, \code{\link{remove_image_tags}}
 }
