@@ -35,7 +35,49 @@ describe(vis, bill_url)
 
 ## Custom Vision
 
-To communicate with the Custom Vision service, call the `customvision_training_endpoint` function with the service URL and key.
+Custom Vision defines two different types of endpoint: a training endpoint, and a prediction endpoint. To communicate with these, call the `customvision_training_endpoint` and `customvision_prediction_endpoint` functions with the service URL and key.
+
+```r
+# training a model
+cusvis <- customvision_training_endpoint(
+    url="https://location.api.cognitive.microsoft.com/",
+    key="training_key"
+)
+
+# different projects can exist on the one endpoint
+list_projects(cusvis)
+
+# create a classification project (one tag/label per image)
+proj <- create_classification_project(cusvis, "myproject")
+
+img1 <- dir("path/to/images/tag1", full.names=TRUE)
+img2 <- dir("path/to/images/tag2", full.names=TRUE)
+add_images(proj, img1, tags="tag1")
+add_images(proj, img2, tags="tag2")
+
+# train the model
+mod <- train_model(proj)
+
+# publish to the prediction resource (use AzureRMR framework to get resource ID)
+pred_res <- AzureRMR::get_azure_login("mytenant")$
+    get_subscription("sub_id")$
+    get_resource_group("rgname")$
+    get_cognitive_service("cusvis_prediction")
+
+publish_model(mod, "mymodel", pred_res)
+
+# get predictions from the prediction endpoint
+cusvis_pred <- customvision_prediction_endpoint(
+    url="https://location.api.cognitive.microsoft.com/",
+    key="prediction_key"
+)
+
+# must supply project ID to access the published service
+project_id <- proj$project$id
+cusvis_service <- classification_service(cusvis_pred, project_id, "mymodel")
+
+predict(cusvis_service, "testimage.jpg")
+```
 
 ----
 <p align="center"><a href="https://github.com/Azure/AzureR"><img src="https://github.com/Azure/AzureR/raw/master/images/logo2.png" width=800 /></a></p>

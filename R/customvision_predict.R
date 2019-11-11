@@ -29,8 +29,10 @@
 #' predict(mod, imgraw, type="list")
 #'
 #' # predicting with the prediction endpoint
+#' # you'll need either the project object or the ID
+#' proj_id <- myproj$project$id
 #' pred_endp <- customvision_prediction_endpoint(url="endpoint_url", key="pred_key")
-#' pred_svc <- classification_service(pred_endp, testproj, "iteration1")
+#' pred_svc <- classification_service(pred_endp, proj_id, "iteration1")
 #' predict(pred_svc, "testimage.jpg")
 #'
 #' }
@@ -106,6 +108,14 @@ customvision_predict_internal <- function(object, images, type, save_result, ver
 #' [`predict.classification_service`], [`predict.object_detection_service`], [`do_prediction_op`]
 #'
 #' [`train_model`], [`publish_model`]
+#' @examples
+#' \dontrun{
+#'
+#' pred_endp <- customvision_prediction_endpoint(url="endpoint_url", key="pred_key")
+#' classification_service(pred_endp, "project_id", "publishedname")
+#' object_detection_service(pred_endp, "project2_id", "publishedname2")
+#'
+#' }
 #' @aliases customvision_predictive_service
 #' @rdname customvision_predictive_service
 #' @export

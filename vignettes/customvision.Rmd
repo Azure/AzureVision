@@ -242,7 +242,7 @@ Publishing a model requires knowing the Azure resource ID of the prediction reso
 publish_model(mod, "iteration1", pred_res)
 ```
 
-Once a model has been published, we can obtain predictions from the prediction endpoint in a manner very similar to previously. Define a classification predictive service with `classification_service`, and then call the `predict` method:
+Once a model has been published, we can obtain predictions from the prediction endpoint in a manner very similar to previously. We create a predictive service object with `classification_service`, and then call the `predict` method. Note that a required input is the project ID; you can supply this directly or via the project object.
 
 ```r
 pred_url <- pred_res$properties$endpoint
@@ -250,8 +250,8 @@ pred_key <- pred_res$list_keys()[1]
 
 pred_endp <- customvision_prediction_endpoint(url=pred_url, key=pred_key)
 
-# service we published above
-pred_svc <- classification_service(pred_endp, testproj, "iteration1")
+project_id <- testproj$project$id
+pred_svc <- classification_service(pred_endp, project_id, "iteration1")
 
 # predictions from prediction endpoint -- same as before
 predsvc_tags <- predict(pred_svc, validation_imgs)

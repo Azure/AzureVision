@@ -55,8 +55,10 @@ imgraw <- readBin("testimage.jpg", "raw", file.size("testimage.jpg"))
 predict(mod, imgraw, type="list")
 
 # predicting with the prediction endpoint
+# you'll need either the project object or the ID
+proj_id <- myproj$project$id
 pred_endp <- customvision_prediction_endpoint(url="endpoint_url", key="pred_key")
-pred_svc <- classification_service(pred_endp, testproj, "iteration1")
+pred_svc <- classification_service(pred_endp, proj_id, "iteration1")
 predict(pred_svc, "testimage.jpg")
 
 }
