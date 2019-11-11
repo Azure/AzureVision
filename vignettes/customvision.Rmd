@@ -28,13 +28,13 @@ pred_res <- rg$create_cognitive_service("mycustvispred",
 
 ## Training
 
-Custom Vision defines two different types of endpoint: a training endpoint, and a prediction endpoint. Somewhat confusingly, they can both share the same host, but use different paths and authentication keys. To start, call the `customvision_training_endpoint` function with the service URL and key.
+Custom Vision defines two different types of endpoint: a training endpoint, and a prediction endpoint. Somewhat confusingly, they can both share the same hostname, but use different paths and authentication keys. To start, call the `customvision_training_endpoint` function with the service URL and key.
 
 ```r
-endp <- customvision_training_endpoint(
-    url="https://australiaeast.api.cognitive.microsoft.com",
-    key="training_key"
-)
+url <- res$properties$endpoint
+key <- res$list_keys()[1]
+
+endp <- customvision_training_endpoint(url=url, key=key)
 ```
 
 ### Creating the project
@@ -231,11 +231,11 @@ This shows that the model got 19 out of 20 predictions correct on the validation
 
 ## Deployment
 
-### Publishing to a prediction endpoint
+### Publishing to a prediction resource
 
-The code above demonstrates using the training endpoint to obtain predictions, which is really meant only for model testing and validation. For production purposes, we would normally _publish_ a trained model to a Custom Vision prediction endpoint. Among other things, a user with access to the training endpoint has complete freedom to modify the model and the data, whereas access to the prediction endpoint only allows getting predictions.
+The code above demonstrates using the training endpoint to obtain predictions, which is really meant only for model testing and validation. For production purposes, we would normally _publish_ a trained model to a Custom Vision prediction resource. Among other things, a user with access to the training endpoint has complete freedom to modify the model and the data, whereas access to the prediction endpoint only allows getting predictions.
 
-Publishing a model requires knowing the Azure resource ID of the prediction endpoint. Here, we'll use the resource object that was created earlier using AzureRMR; you can also obtain this information from the Azure Portal.
+Publishing a model requires knowing the Azure resource ID of the prediction resource. Here, we'll use the resource object that was created earlier using AzureRMR; you can also obtain this information from the Azure Portal.
 
 ```r
 # publish to the prediction resource we created above
@@ -245,10 +245,10 @@ publish_model(mod, "iteration1", pred_res)
 Once a model has been published, we can obtain predictions from the prediction endpoint in a manner very similar to previously. Define a classification predictive service with `classification_service`, and then call the `predict` method:
 
 ```r
-pred_endp <- customvision_prediction_endpoint(
-    url="https://australiaeast.api.cognitive.microsoft.com/",
-    key="prediction_key"
-)
+pred_url <- pred_res$properties$endpoint
+pred_key <- pred_res$list_keys()[1]
+
+pred_endp <- customvision_prediction_endpoint(url=pred_url, key=pred_key)
 
 # service we published above
 pred_svc <- classification_service(pred_endp, testproj, "iteration1")

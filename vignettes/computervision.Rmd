@@ -8,15 +8,31 @@ vignette: >
   %\VignetteEncoding{utf8}
 ---
 
-To communicate with the Computer Vision service, call the `computervision_endpoint` function with the service URL and key. Rather than a key, you can also supply an OAuth token obtained with the AzureAuth package.
+The Computer Vision service provides developers with access to advanced algorithms that process images and return information, depending on the visual features you're interested in. For example, Computer Vision can determine if an image contains adult content, or it can find all of the human faces in an image.
+
+## Creating the resources
+
+You can create a Computer Vision resource using the AzureRMR framework for interacting with Resource Manager. The available service tiers are `F0` (free, limited to 20 API calls per minute and 5k calls per month) and `S1` (up to 10 calls per second).
 
 ```r
 library(AzureVision)
+rg <- AzureRMR::get_azure_login("yourtenant")$
+    get_subscription("sub_id")$
+    get_resource_group("rgname")$
 
-vis <- computervision_endpoint(
-    url="https://accountname.cognitiveservices.azure.com/",
-    key="account_key"
-)
+res <- rg$create_cognitive_service("myvis",
+    service_type="ComputerVision", service_tier="S1")
+```
+
+## Client interface
+
+To communicate with the Computer Vision service, call the `computervision_endpoint` function with the service URL and key. Rather than a key, you can also supply an OAuth token obtained with the AzureAuth package.
+
+```r
+url <- res$properties$endpoint
+key <- res$list_keys()[1]
+
+vis <- computervision_endpoint(url=url, key=key)
 ```
 
 AzureVision supports all the Computer Vision API calls:
