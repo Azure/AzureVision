@@ -1,5 +1,7 @@
 # AzureVision <img src="man/figures/logo.png" align="right" width=150 />
 
+[![CRAN](https://www.r-pkg.org/badges/version/AzureVision)](https://cran.r-project.org/package=AzureAuth)
+![Downloads](https://cranlogs.r-pkg.org/badges/AzureVision)
 [![Build Status](https://asiadatascience.visualstudio.com/AzureR/_apis/build/status/Azure.AzureVision?branchName=master)](https://asiadatascience.visualstudio.com/AzureR/_build/latest?definitionId=13&branchName=master)
 
 An R frontend to [Azure Computer Vision](https://azure.microsoft.com/services/cognitive-services/computer-vision/) and [Azure Custom Vision](https://azure.microsoft.com/services/cognitive-services/custom-vision-service/), building on the low-level functionality provided by the [AzureCognitive](https://github.com/Azure/AzureCognitive) package.
@@ -79,6 +81,24 @@ cusvis_service <- classification_service(cusvis_pred, project_id, "mymodel")
 predict(cusvis_service, "testimage.jpg")
 ```
 
+## Resource Manager interface
+
+You can create Computer Vision and Custom Vision resources using the AzureRMR framework.
+
+For Computer Vision, the available service tiers are `F0` (free, limited to 20 API calls per minute and 5k calls per month) and `S1` (up to 10 calls per second). For Custom Vision, the tiers are `F0` (free, limited to 2 projects for training and 10k transactions/month for prediction) and `S0`. Note that Custom Vision requires at least _two_ resources: one for training, and the other for prediction.
+
+```r
+rg <- AzureRMR::get_azure_login("yourtenant")$
+    get_subscription("sub_id")$
+    get_resource_group("rgname")$
+
+# Computer Vision
+rg$create_cognitive_service("myvis", service_type="ComputerVision", service_tier="S1")
+
+# Custom Vision (training and prediction)
+rg$create_cognitive_service("mycustvis", service_type="CustomVision", service_tier="S0")
+rg$create_cognitive_service("mycustvispred", service_type="CustomVision.Prediction", service_tier="S0")
+```
+
 ----
 <p align="center"><a href="https://github.com/Azure/AzureR"><img src="https://github.com/Azure/AzureR/raw/master/images/logo2.png" width=800 /></a></p>
-
