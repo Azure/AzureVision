@@ -11,7 +11,8 @@ publish_model(model, name, prediction_resource)
 
 unpublish_model(model, confirm = TRUE)
 
-export_model(model, format, download = TRUE, destfile = NULL)
+export_model(model, format,
+  destfile = basename(httr::parse_url(dl_link)$path))
 
 list_model_exports(model)
 }
@@ -26,12 +27,12 @@ list_model_exports(model)
 
 \item{format}{For \code{export_model}, the format to export to. See below for supported formats.}
 
-\item{download}{For \code{export_model}, whether to download the exported model.}
+\item{destfile}{For \code{export_model}, the destination file for downloading. Set this to NULL to skip downloading.}
 
-\item{destfile}{For \code{export_model}, the destination file for downloading (if \code{download} is TRUE).}
+\item{download}{For \code{export_model}, whether to download the exported model.}
 }
 \value{
-\code{export_model} returns the URL of the exported file, invisibly if \code{download=TRUE}.
+\code{export_model} returns the URL of the exported file, invisibly if it was downloaded.
 
 \code{list_model_exports} returns a data frame detailing the formats the current model has been exported to, along with their download URLs.
 }
@@ -43,12 +44,12 @@ Publishing a model makes it available to clients as a predictive service. Export
 
 The \code{format} argument to \code{export_model} can be one of the following. Note that exporting a model requires that the project was created with support for it.
 \itemize{
-\item "onnx": ONNX 1.2
-\item "coreml": CoreML, for iOS 11 devices
-\item "tensorflow": TensorFlow
-\item "tensorflow lite": TensorFlow Lite for Android devices
-\item "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
-\item "vaidk": Vision AI Development Kit
+\item \code{"onnx"}: ONNX 1.2
+\item \code{"coreml"}: CoreML, for iOS 11 devices
+\item \code{"tensorflow"}: TensorFlow
+\item \code{"tensorflow lite"}: TensorFlow Lite for Android devices
+\item \code{"linux docker"}, \code{"windows docker"}, \code{"arm docker"}: A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
+\item \code{"vaidk"}: Vision AI Development Kit
 }
 }
 \examples{
