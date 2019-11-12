@@ -28,8 +28,6 @@ list_model_exports(model)
 \item{format}{For \code{export_model}, the format to export to. See below for supported formats.}
 
 \item{destfile}{For \code{export_model}, the destination file for downloading. Set this to NULL to skip downloading.}
-
-\item{download}{For \code{export_model}, whether to download the exported model.}
 }
 \value{
 \code{export_model} returns the URL of the exported file, invisibly if it was downloaded.

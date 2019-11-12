@@ -4,21 +4,20 @@
 #' @param name For `publish_model`, the name to assign to the published model on the prediction endpoint.
 #' @param prediction_resource For `publish_model`, the Custom Vision prediction resource to publish to. This can either be a string containing the Azure resource ID, or an AzureRMR resource object.
 #' @param format For `export_model`, the format to export to. See below for supported formats.
-#' @param download For `export_model`, whether to download the exported model.
-#' @param destfile For `export_model`, the destination file for downloading (if `download` is TRUE).
+#' @param destfile For `export_model`, the destination file for downloading. Set this to NULL to skip downloading.
 #' @param confirm For `unpublish_model`, whether to ask for confirmation first.
 #' @details
 #' Publishing a model makes it available to clients as a predictive service. Exporting a model serialises it to a file of the given format in Azure storage, which can then be downloaded. Each iteration of the model can be published or exported separately.
 #'
 #' The `format` argument to `export_model` can be one of the following. Note that exporting a model requires that the project was created with support for it.
-#' - "onnx": ONNX 1.2
-#' - "coreml": CoreML, for iOS 11 devices
-#' - "tensorflow": TensorFlow
-#' - "tensorflow lite": TensorFlow Lite for Android devices
-#' - "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
-#' - "vaidk": Vision AI Development Kit
+#' - `"onnx"`: ONNX 1.2
+#' - `"coreml"`: CoreML, for iOS 11 devices
+#' - `"tensorflow"`: TensorFlow
+#' - `"tensorflow lite"`: TensorFlow Lite for Android devices
+#' - `"linux docker"`, `"windows docker"`, `"arm docker"`: A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
+#' - `"vaidk"`: Vision AI Development Kit
 #' @return
-#' `export_model` returns the URL of the exported file, invisibly if `download=TRUE`.
+#' `export_model` returns the URL of the exported file, invisibly if it was downloaded.
 #'
 #' `list_model_exports` returns a data frame detailing the formats the current model has been exported to, along with their download URLs.
 #' @seealso
@@ -72,7 +71,7 @@ unpublish_model <- function(model, confirm=TRUE)
 
 #' @rdname customvision_publish
 #' @export
-export_model <- function(model, format, download=TRUE, destfile=NULL)
+export_model <- function(model, format, destfile=basename(httr::parse_url(dl_link)$path))
 {
     settings <- model$project$project$settings
 
@@ -109,10 +108,8 @@ export_model <- function(model, format, download=TRUE, destfile=NULL)
     }
 
     dl_link <- exports$downloadUri[this_exp]
-    if(download)
+    if(!is.null(destfile))
     {
-        if(is.null(destfile))
-            destfile <- basename(httr::parse_url(dl_link)$path)
         message("Downloading to ", destfile)
         utils::download.file(dl_link, destfile)
         invisible(dl_link)
