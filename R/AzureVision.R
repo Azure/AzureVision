@@ -13,7 +13,7 @@ utils::globalVariables("id")
 
 .onLoad <- function(libname, pkgname)
 {
-    options(azure_computervision_api_version="v2.0")
+    options(azure_computervision_api_version="v2.1")
     options(azure_customvision_training_api_version="v3.1")
     options(azure_customvision_prediction_api_version="v3.0")
 }
