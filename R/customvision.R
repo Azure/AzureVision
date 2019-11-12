@@ -45,17 +45,21 @@ print.customvision_project <- function(x, ...)
 #' A Custom Vision project contains the metadata for a model: its intended purpose (classification vs object detection), the domain, the set of training images, and so on. Once you have created a project, you upload images to it, and train models based on those images. A trained model can then be published as a predictive service, or exported for standalone use.
 #'
 #' By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting `export_target="standard"` enables exporting to the following formats:
-#' - "onnx": ONNX 1.2
-#' - "coreml": CoreML, for iOS 11 devices
-#' - "tensorflow": TensorFlow
-#' - "tensorflow lite": TensorFlow Lite for Android devices
-#' - "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
+#' - ONNX 1.2
+#' - CoreML, for iOS 11 devices
+#' - TensorFlow
+#' - TensorFlow Lite, for Android devices
+#' - A Docker image for the Windows, Linux or Raspberry Pi 3 (ARM) platform
 #'
 #' Setting `export_target="vaidk"` allows exporting to Vision AI Development Kit format, in addition to the above.
 #' @return
 #' `delete_project` returns NULL invisibly, on a successful deletion. The others return an object of class `customvision_project`.
 #' @seealso
 #' [`customvision_training_endpoint`], [`add_images`], [`train_model`], [`publish_model`], [`predict.customvision_model`], [`do_training_op`]
+#'
+#' - [CustomVision.ai](https://customvision.ai): An interactive site for building Custom Vision models, provided by Microsoft
+#' - [Training API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Training_3.0/operations/5c771cdcbf6a2b18a0c3b7fa)
+#' - [Prediction API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Prediction_3.0/operations/5c82db60bf6a2b11a8247c15)
 #' @examples
 #' \dontrun{
 #'

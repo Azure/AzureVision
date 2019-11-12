@@ -29,9 +29,12 @@ These functions are handles to a predictive service that was previously publishe
 \examples{
 \dontrun{
 
+endp <- customvision_training_endpoint(url="endpoint_url", key="key")
+myproj <- get_project(endp, "myproject")
+
+# getting the ID from the project object -- in practice you would store the ID separately
 pred_endp <- customvision_prediction_endpoint(url="endpoint_url", key="pred_key")
-classification_service(pred_endp, "project_id", "publishedname")
-object_detection_service(pred_endp, "project2_id", "publishedname2")
+classification_service(pred_endp, myproj$project$id, "publishedname")
 
 }
 }

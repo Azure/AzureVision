@@ -55,11 +55,11 @@ A Custom Vision project contains the metadata for a model: its intended purpose 
 
 By default, a Custom Vision project does not support exporting the model; this allows it to be more complex, and thus potentially more accurate. Setting \code{export_target="standard"} enables exporting to the following formats:
 \itemize{
-\item "onnx": ONNX 1.2
-\item "coreml": CoreML, for iOS 11 devices
-\item "tensorflow": TensorFlow
-\item "tensorflow lite": TensorFlow Lite for Android devices
-\item "linux docker", "windows docker", "arm docker": A Docker image for the given platform (Raspberry Pi 3 in the case of ARM)
+\item ONNX 1.2
+\item CoreML, for iOS 11 devices
+\item TensorFlow
+\item TensorFlow Lite, for Android devices
+\item A Docker image for the Windows, Linux or Raspberry Pi 3 (ARM) platform
 }
 
 Setting \code{export_target="vaidk"} allows exporting to Vision AI Development Kit format, in addition to the above.
@@ -85,4 +85,9 @@ update_project(endp, "myproject", export_target="vaidk")
 }
 \seealso{
 \code{\link{customvision_training_endpoint}}, \code{\link{add_images}}, \code{\link{train_model}}, \code{\link{publish_model}}, \code{\link{predict.customvision_model}}, \code{\link{do_training_op}}
+\itemize{
+\item \href{https://customvision.ai}{CustomVision.ai}: An interactive site for building Custom Vision models, provided by Microsoft
+\item \href{https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Training_3.0/operations/5c771cdcbf6a2b18a0c3b7fa}{Training API reference}
+\item \href{https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Prediction_3.0/operations/5c82db60bf6a2b11a8247c15}{Prediction API reference}
+}
 }

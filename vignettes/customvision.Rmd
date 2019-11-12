@@ -288,3 +288,9 @@ Content type 'application/octet-stream' length 4673656 bytes (4.5 MB)
 downloaded 4.5 MB
 ```
 
+## See also
+
+- [CustomVision.ai](https://customvision.ai): An interactive site for building Custom Vision models, provided by Microsoft
+- [Training API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Training_3.0/operations/5c771cdcbf6a2b18a0c3b7fa)
+- [Prediction API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Prediction_3.0/operations/5c82db60bf6a2b11a8247c15)
+

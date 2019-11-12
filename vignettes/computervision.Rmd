@@ -207,3 +207,8 @@ read_text(vis, "gettysburg.png")
 make_thumbnail(vis, "bill.jpg", "bill_thumb.jpg")
 ```
 <img src="../inst/images/bill_thumb.jpg"/>
+
+## See also
+
+- [Computer Vision Docs page](https://docs.microsoft.com/en-us/azure/cognitive-services/Computer-vision/Home)
+- [API reference](https://westus.dev.cognitive.microsoft.com/docs/services/5cd27ec07268f6c679a3e641/operations/56f91f2e778daf14a499f21b)
