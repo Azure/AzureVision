@@ -1,6 +1,6 @@
 # AzureVision <img src="man/figures/logo.png" align="right" width=150 />
 
-[![CRAN](https://www.r-pkg.org/badges/version/AzureVision)](https://cran.r-project.org/package=AzureAuth)
+[![CRAN](https://www.r-pkg.org/badges/version/AzureVision)](https://cran.r-project.org/package=AzureVision)
 ![Downloads](https://cranlogs.r-pkg.org/badges/AzureVision)
 [![Build Status](https://asiadatascience.visualstudio.com/AzureR/_apis/build/status/Azure.AzureVision?branchName=master)](https://asiadatascience.visualstudio.com/AzureR/_build/latest?definitionId=13&branchName=master)
 
