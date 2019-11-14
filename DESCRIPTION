@@ -5,7 +5,7 @@ Authors@R: c(
     person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
     person("Microsoft", role="cph")
     )
-Description: An interface to An R frontend to 'Azure Computer Vision' <https://docs.microsoft.com/azure/cognitive-services/Computer-vision/Home> and 'Azure Custom Vision' <https://docs.microsoft.com/azure/cognitive-services/custom-vision-service/home>, building on the low-level functionality provided by the 'AzureCognitive' package. These services allow users to leverage the cloud to carry out visual recognition tasks using advanced image processing models, without needing powerful hardware of their own. Part of the 'AzureR' family of packages.
+Description: An interface to 'Azure Computer Vision' <https://docs.microsoft.com/azure/cognitive-services/Computer-vision/Home> and 'Azure Custom Vision' <https://docs.microsoft.com/azure/cognitive-services/custom-vision-service/home>, building on the low-level functionality provided by the 'AzureCognitive' package. These services allow users to leverage the cloud to carry out visual recognition tasks using advanced image processing models, without needing powerful hardware of their own. Part of the 'AzureR' family of packages.
 URL: https://github.com/Azure/AzureVision https://github.com/Azure/AzureR
 BugReports: https://github.com/Azure/AzureVision/issues
 License: MIT + file LICENSE
