@@ -21,7 +21,7 @@ rg <- AzureRMR::get_azure_login("yourtenant")$
     get_resource_group("rgname")
 
 res <- rg$create_cognitive_service("mycustvis",
-    service_type="CustomVision", service_tier="S0")
+    service_type="CustomVision.Training", service_tier="S0")
 pred_res <- rg$create_cognitive_service("mycustvispred",
     service_type="CustomVision.Prediction", service_tier="S0")
 ```
