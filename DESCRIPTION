@@ -1,6 +1,6 @@
 Package: AzureVision
 Title: Interface to Azure Computer Vision Services
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
     person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
     person("Microsoft", role="cph")
