@@ -1,8 +1,8 @@
 Package: AzureVision
 Title: Interface to Azure Computer Vision Services
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
-    person("Hong", "Ooi", , "hongooi@microsoft.com", role = c("aut", "cre")),
+    person("Hong", "Ooi", , "hongooi73@gmail.com", role = c("aut", "cre")),
     person("Microsoft", role="cph")
     )
 Description: An interface to 'Azure Computer Vision' <https://docs.microsoft.com/azure/cognitive-services/Computer-vision/Home> and 'Azure Custom Vision' <https://docs.microsoft.com/azure/cognitive-services/custom-vision-service/home>, building on the low-level functionality provided by the 'AzureCognitive' package. These services allow users to leverage the cloud to carry out visual recognition tasks using advanced image processing models, without needing powerful hardware of their own. Part of the 'AzureR' family of packages.
@@ -19,6 +19,7 @@ Imports:
     utils
 Suggests:
     knitr,
+    rmarkdown,
     AzureAuth,
     testthat
 Roxygen: list(markdown=TRUE)

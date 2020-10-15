@@ -5,7 +5,7 @@
 ![R-CMD-check](https://github.com/Azure/AzureVision/workflows/R-CMD-check/badge.svg)
 
 
-An R frontend to [Azure Computer Vision](https://azure.microsoft.com/services/cognitive-services/computer-vision/) and [Azure Custom Vision](https://azure.microsoft.com/services/cognitive-services/custom-vision-service/), building on the low-level functionality provided by the [AzureCognitive](https://github.com/Azure/AzureCognitive) package. These services let you leverage the cloud to carry out visual recognition tasks using advanced image processing models, without needing powerful hardware of your own.
+An R frontend to [Azure Computer Vision](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/) and [Azure Custom Vision](https://azure.microsoft.com/en-us/services/cognitive-services/custom-vision-service/), building on the low-level functionality provided by the [AzureCognitive](https://github.com/Azure/AzureCognitive) package. These services let you leverage the cloud to carry out visual recognition tasks using advanced image processing models, without needing powerful hardware of your own.
 
 The primary repo for this package is at https://github.com/Azure/AzureVision; please submit issues and PRs there. It is also mirrored at the Cloudyr org at https://github.com/cloudyr/AzureVision. You can install the development version of the package with `devtools::install_github("Azure/AzureVision")`.
 
