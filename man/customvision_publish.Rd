@@ -11,8 +11,7 @@ publish_model(model, name, prediction_resource)
 
 unpublish_model(model, confirm = TRUE)
 
-export_model(model, format,
-  destfile = basename(httr::parse_url(dl_link)$path))
+export_model(model, format, destfile = basename(httr::parse_url(dl_link)$path))
 
 list_model_exports(model)
 }

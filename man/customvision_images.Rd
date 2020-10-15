@@ -11,11 +11,9 @@
 \usage{
 add_images(project, ...)
 
-\method{add_images}{classification_project}(project, images, tags = NULL,
-  ...)
+\method{add_images}{classification_project}(project, images, tags = NULL, ...)
 
-\method{add_images}{object_detection_project}(project, images,
-  regions = NULL, ...)
+\method{add_images}{object_detection_project}(project, images, regions = NULL, ...)
 
 list_images(project, include = c("all", "tagged", "untagged"),
   as = c("ids", "dataframe", "list"), iteration = NULL)

@@ -12,6 +12,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{AzureCognitive}{\code{\link[AzureCognitive]{cognitive_endpoint}}, \code{\link[AzureCognitive]{call_cognitive_endpoint}}}
+  \item{AzureCognitive}{\code{\link[AzureCognitive]{call_cognitive_endpoint}}, \code{\link[AzureCognitive]{cognitive_endpoint}}}
 }}
 

@@ -26,8 +26,7 @@ tag(endpoint, image, language = "en", ...)
 
 categorize(endpoint, image, ...)
 
-read_text(endpoint, image, detect_orientation = TRUE, language = "en",
-  ...)
+read_text(endpoint, image, detect_orientation = TRUE, language = "en", ...)
 
 list_computervision_domains(endpoint, ...)
 

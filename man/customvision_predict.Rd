@@ -7,14 +7,13 @@
 \alias{predict.object_detection_service}
 \title{Get predictions from a Custom Vision model}
 \usage{
-\method{predict}{customvision_model}(object, images, type = c("class",
-  "prob", "list"), ...)
+\method{predict}{customvision_model}(object, images, type = c("class", "prob", "list"), ...)
 
-\method{predict}{classification_service}(object, images,
-  type = c("class", "prob", "list"), save_result = FALSE, ...)
+\method{predict}{classification_service}(object, images, type = c("class",
+  "prob", "list"), save_result = FALSE, ...)
 
-\method{predict}{object_detection_service}(object, images,
-  type = c("class", "prob", "list"), save_result = FALSE, ...)
+\method{predict}{object_detection_service}(object, images, type = c("class",
+  "prob", "list"), save_result = FALSE, ...)
 }
 \arguments{
 \item{object}{A Custom Vision object from which to get predictions. See 'Details' below.}

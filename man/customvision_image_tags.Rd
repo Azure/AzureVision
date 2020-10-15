@@ -9,11 +9,10 @@
 \usage{
 add_image_tags(project, image_ids, tags)
 
-\method{add_image_tags}{classification_project}(project,
-  image_ids = list_images(project, "untagged"), tags)
+\method{add_image_tags}{classification_project}(project, image_ids = list_images(project, "untagged"), tags)
 
-remove_image_tags(project, image_ids = list_images(project, "tagged", as
-  = "ids"), tags = list_tags(project, as = "ids"))
+remove_image_tags(project, image_ids = list_images(project, "tagged", as =
+  "ids"), tags = list_tags(project, as = "ids"))
 }
 \arguments{
 \item{project}{a Custom Vision classification project.}

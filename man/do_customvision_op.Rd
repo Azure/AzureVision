@@ -13,8 +13,7 @@ do_training_op(project, ...)
 
 do_prediction_op(service, ...)
 
-\method{do_prediction_op}{customvision_predictive_service}(service, op,
-  ...)
+\method{do_prediction_op}{customvision_predictive_service}(service, op, ...)
 }
 \arguments{
 \item{project}{For \code{do_training_op}, a Custom Vision project.}

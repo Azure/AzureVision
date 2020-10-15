@@ -11,8 +11,8 @@
 \title{Create, retrieve, rename and delete a model iteration}
 \usage{
 train_model(project, training_method = c("quick", "advanced"),
-  max_time = 1, force = FALSE, email = NULL,
-  wait = (training_method == "quick"))
+  max_time = 1, force = FALSE, email = NULL, wait = (training_method ==
+  "quick"))
 
 list_models(project, as = c("ids", "list"))
 
@@ -22,8 +22,7 @@ rename_model(model, name, ...)
 
 delete_model(object, ...)
 
-\method{delete_model}{customvision_project}(object, iteration = NULL,
-  confirm = TRUE, ...)
+\method{delete_model}{customvision_project}(object, iteration = NULL, confirm = TRUE, ...)
 
 \method{delete_model}{customvision_model}(object, confirm = TRUE, ...)
 }
