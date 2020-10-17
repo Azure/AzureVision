@@ -93,7 +93,7 @@ Here, we specify the export target to be `standard` to support exporting the fin
 
 ### Adding and tagging images
 
-Since a Custom Vision model is trained in Azure and not locally, we need to upload some images. The data we'll use comes from the Microsoft [Computer Vision Best Practices](https://github.com/microsoft/ComputerVision) project. This is a simple set of images containing 4 kinds of objects one might find in a fridge: cans, cartons, milk bottles, and water bottles.
+Since a Custom Vision model is trained in Azure and not locally, we need to upload some images. The data we'll use comes from the Microsoft [Computer Vision Best Practices](https://github.com/microsoft/computervision-recipes) project. This is a simple set of images containing 4 kinds of objects one might find in a fridge: cans, cartons, milk bottles, and water bottles.
 
 ```r
 download.file(
@@ -290,7 +290,7 @@ downloaded 4.5 MB
 
 ## See also
 
-- [CustomVision.ai](https://customvision.ai/): An interactive site for building Custom Vision models, provided by Microsoft
+- [CustomVision.ai](https://www.customvision.ai/): An interactive site for building Custom Vision models, provided by Microsoft
 - [Training API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Training_3.0/operations/5c771cdcbf6a2b18a0c3b7fa)
 - [Prediction API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Prediction_3.0/operations/5c82db60bf6a2b11a8247c15)
 

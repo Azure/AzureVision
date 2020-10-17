@@ -57,7 +57,7 @@ print.customvision_project <- function(x, ...)
 #' @seealso
 #' [`customvision_training_endpoint`], [`add_images`], [`train_model`], [`publish_model`], [`predict.customvision_model`], [`do_training_op`]
 #'
-#' - [CustomVision.ai](https://customvision.ai/): An interactive site for building Custom Vision models, provided by Microsoft
+#' - [CustomVision.ai](https://www.customvision.ai/): An interactive site for building Custom Vision models, provided by Microsoft
 #' - [Training API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Training_3.0/operations/5c771cdcbf6a2b18a0c3b7fa)
 #' - [Prediction API reference](https://southcentralus.dev.cognitive.microsoft.com/docs/services/Custom_Vision_Prediction_3.0/operations/5c82db60bf6a2b11a8247c15)
 #' @examples
